@@ -1,6 +1,7 @@
 ﻿using ClassifiedsApp.Application.Interfaces.Repositories.AdImages;
 using ClassifiedsApp.Application.Interfaces.Repositories.Ads;
 using ClassifiedsApp.Application.Interfaces.Repositories.Categories;
+using ClassifiedsApp.Application.Interfaces.Repositories.Chats;
 using ClassifiedsApp.Application.Interfaces.Repositories.Locations;
 using ClassifiedsApp.Application.Interfaces.Repositories.Reports;
 using ClassifiedsApp.Application.Interfaces.Repositories.Users;
@@ -13,6 +14,7 @@ using ClassifiedsApp.Infrastructure.Persistence.Context;
 using ClassifiedsApp.Infrastructure.Persistence.Repositories.AdImages;
 using ClassifiedsApp.Infrastructure.Persistence.Repositories.Ads;
 using ClassifiedsApp.Infrastructure.Persistence.Repositories.Categories;
+using ClassifiedsApp.Infrastructure.Persistence.Repositories.Chats;
 using ClassifiedsApp.Infrastructure.Persistence.Repositories.Locations;
 using ClassifiedsApp.Infrastructure.Persistence.Repositories.Reports;
 using ClassifiedsApp.Infrastructure.Persistence.Repositories.Users;
@@ -129,6 +131,11 @@ public static class ServiceRegistration
 		services.AddScoped<IAuthService, AuthService>();
 		services.AddScoped<IUserService, UserService>();
 		services.AddScoped<ICurrentUserService, CurrentUserService>();
+
+		services.AddScoped<IChatMessageReadRepository, ChatMessageReadRepository>();
+		services.AddScoped<IChatMessageWriteRepository, ChatMessageWriteRepository>();
+		services.AddScoped<IChatRoomReadRepository, ChatRoomReadRepository>();
+		services.AddScoped<IChatRoomWriteRepository, ChatRoomWriteRepository>();
 
 		services.AddScoped<TestJobService>(); // add job service.
 	}

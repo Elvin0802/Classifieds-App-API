@@ -21,9 +21,8 @@ public class TokenService : ITokenService
 	{
 		var claims = new List<Claim>
 		{
-			new Claim(JwtRegisteredClaimNames.Sub, id.ToString()),
-			new Claim(JwtRegisteredClaimNames.Email, email),
-			new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+			new Claim(ClaimTypes.NameIdentifier, id.ToString()),
+			new Claim(ClaimTypes.Email, email),
 			new Claim("UserId", id.ToString()) // delete this line. api have Sub.
 		};
 

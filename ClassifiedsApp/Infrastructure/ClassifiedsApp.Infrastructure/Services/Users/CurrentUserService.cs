@@ -1,6 +1,5 @@
 ﻿using ClassifiedsApp.Application.Interfaces.Services.Users;
 using Microsoft.AspNetCore.Http;
-using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
 namespace ClassifiedsApp.Infrastructure.Services.Users;
@@ -15,13 +14,13 @@ public class CurrentUserService : ICurrentUserService
 	}
 
 	public Guid? UserId =>
-			Guid.Parse(_httpContextAccessor.HttpContext?.User?.FindFirstValue(JwtRegisteredClaimNames.Sub)!);
+			Guid.Parse(_httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
 	public string? UserName =>
 			_httpContextAccessor.HttpContext?.User?.Identity?.Name;
 
 	public string? Email =>
-			_httpContextAccessor.HttpContext?.User?.FindFirstValue(JwtRegisteredClaimNames.Email);
+			_httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.Email);
 
 	public bool IsAuthenticated =>
 			_httpContextAccessor.HttpContext?.User?.Identity?.IsAuthenticated ?? false;

@@ -1,6 +1,6 @@
-﻿using FluentValidation;
+﻿using Azure.Identity;
+using FluentValidation;
 using Serilog;
-using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 using System.Security.Claims;
 using System.Text.Json;
@@ -31,7 +31,7 @@ public class GlobalExceptionHandlerMiddleware
 
 	private static void LogError(HttpContext context, Exception ex)
 	{
-		var userId = context.User.FindFirstValue(JwtRegisteredClaimNames.Sub) ?? "Unknown";
+		var userId = context.User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "Unknown";
 		var username = context.User.Identity?.Name ?? "Anonymous";
 
 		Log.Error("Unhandled Exception | User: {Username} ({UserId}) | Path: {Path} | Error: {ErrorMessage}",
@@ -43,10 +43,10 @@ public class GlobalExceptionHandlerMiddleware
 		var statusCode = HttpStatusCode.InternalServerError;
 		var message = ex.Message;
 
-		if (ex is ValidationException validationEx)
+		if (ex is ValidationException validationException)
 		{
 			statusCode = HttpStatusCode.BadRequest;
-			var errors = validationEx.Errors.Select(e => e.ErrorMessage).ToList();
+			var errors = validationException.Errors.Select(e => e.ErrorMessage).ToList();
 			message = string.Join("; ", errors);
 		}
 		else if (ex is UnauthorizedAccessException)
@@ -56,6 +56,11 @@ public class GlobalExceptionHandlerMiddleware
 		else if (ex is KeyNotFoundException || ex is ArgumentNullException)
 		{
 			statusCode = HttpStatusCode.NotFound;
+		}
+		else if (ex is AuthenticationFailedException authenticationFailedException)
+		{
+			statusCode = HttpStatusCode.BadRequest;
+			message = authenticationFailedException.Message;
 		}
 
 		var response = new

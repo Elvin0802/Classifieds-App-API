@@ -4,6 +4,5 @@ namespace ClassifiedsApp.Application.Features.Queries.Chats.GetChatRoom;
 
 public class GetChatRoomQuery : GetDataByIdQuery<GetChatRoomQueryResponse>
 {
-	//public Guid ChatRoomId { get; set; }
-	//public Guid UserId { get; set; }
+	public Guid ChatRoomId { get; set; }
 }

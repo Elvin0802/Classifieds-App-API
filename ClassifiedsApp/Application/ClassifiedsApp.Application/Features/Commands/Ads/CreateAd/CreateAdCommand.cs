@@ -1,6 +1,7 @@
 ﻿using ClassifiedsApp.Application.Common.Results;
 using ClassifiedsApp.Application.Dtos.Ads;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 
 namespace ClassifiedsApp.Application.Features.Commands.Ads.CreateAd;
 
@@ -16,5 +17,5 @@ public class CreateAdCommand : IRequest<Result>
 
 	public IList<CreateAdSubCategoryValueDto> SubCategoryValues { get; set; }
 
-	//public IList<string> ImageUrls { get; set; }
+	public IList<IFormFile> Images { get; set; }
 }

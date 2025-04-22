@@ -4,4 +4,5 @@ public enum SubCategoryType
 {
 	Number,
 	Select,
+	Text
 }

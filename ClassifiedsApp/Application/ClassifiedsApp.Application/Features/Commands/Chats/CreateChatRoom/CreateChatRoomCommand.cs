@@ -6,6 +6,5 @@ namespace ClassifiedsApp.Application.Features.Commands.Chats.CreateChatRoom;
 
 public class CreateChatRoomCommand : IRequest<Result<ChatRoomDto>>
 {
-	public Guid BuyerId { get; set; }
 	public Guid AdId { get; set; }
 }

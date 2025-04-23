@@ -23,7 +23,7 @@ public class AuthController : ControllerBase
 	}
 
 	[HttpPost("[action]")]
-	public async Task<IActionResult> Login(LoginCommand command)
+	public async Task<ActionResult<Result<string>>> Login(LoginCommand command)
 	{
 		AuthTokenDto authToken = (await _mediator.Send(command)).Data;
 
@@ -37,12 +37,13 @@ public class AuthController : ControllerBase
 			Expires = authToken.RefreshTokenExpiresAt,
 		});
 
-		return Ok(new { token = authToken.AccessToken });
+		return Ok(Result.Success(authToken.AccessToken, "Login successfully completed."));
+		//return Ok(new { token = authToken.AccessToken });
 		//return Ok(); // use this line for production.
 	}
 
 	[HttpPost("[action]")]
-	public async Task<IActionResult> RefreshTokenLogin()
+	public async Task<ActionResult<Result<string>>> RefreshTokenLogin()
 	{
 		var refreshToken = Request.Cookies["refreshToken"];
 		if (string.IsNullOrEmpty(refreshToken))
@@ -60,12 +61,13 @@ public class AuthController : ControllerBase
 			Expires = authToken.RefreshTokenExpiresAt,
 		});
 
-		return Ok(new { token = authToken.AccessToken });
+		return Ok(Result.Success(authToken.AccessToken, "Refresh Token Login successfully completed."));
+		//return Ok(new { token = authToken.AccessToken });
 	}
 
 	[HttpPost("[action]")]
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin,User")]
-	public async Task<IActionResult> Logout()
+	public async Task<ActionResult<Result>> Logout()
 	{
 		Response.Cookies.Delete("refreshToken", new CookieOptions
 		{
@@ -76,7 +78,8 @@ public class AuthController : ControllerBase
 
 		Response.Headers.Append("Authorization", "");
 
-		return Ok(new { Message = "Log out success." });
+		return Ok(Result.Success("Log Out successfully completed."));
+		//return Ok(new { Message = "Log out success." });
 	}
 
 	[HttpPost("reset-password")]

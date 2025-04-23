@@ -1,7 +1,9 @@
 ﻿using ClassifiedsApp.Application.Common.Results;
 using ClassifiedsApp.Application.Interfaces.Repositories.Ads;
+using ClassifiedsApp.Application.Interfaces.Services.Ads;
 using ClassifiedsApp.Application.Interfaces.Services.Users;
 using ClassifiedsApp.Core.Entities;
+using ClassifiedsApp.Core.Enums;
 using MediatR;
 
 namespace ClassifiedsApp.Application.Features.Commands.Ads.CreateAd;
@@ -11,14 +13,21 @@ public class CreateAdCommandHandler : IRequestHandler<CreateAdCommand, Result>
 	readonly IAdWriteRepository _writeRepository;
 	readonly IAdSubCategoryValueWriteRepository _adSubCategoryWriteRepository;
 	readonly ICurrentUserService _currentUserService;
+	readonly IAdImageService _adImageService;
+
+	// * create consts and add this to global. ( n = AzureNames.ContName; )
+	readonly string _containerName = "api-ad-images";
+
 
 	public CreateAdCommandHandler(IAdWriteRepository writeRepository,
 								  IAdSubCategoryValueWriteRepository adSubCategoryWriteRepository,
-								   ICurrentUserService currentUserService)
+								  ICurrentUserService currentUserService,
+								  IAdImageService adImageService)
 	{
 		_writeRepository = writeRepository;
 		_adSubCategoryWriteRepository = adSubCategoryWriteRepository;
 		_currentUserService = currentUserService;
+		_adImageService = adImageService;
 	}
 
 	/*
@@ -111,15 +120,16 @@ public class CreateAdCommandHandler : IRequestHandler<CreateAdCommand, Result>
 				MainCategoryId = request.MainCategoryId,
 				LocationId = request.LocationId,
 				AppUserId = _currentUserService.UserId!.Value,
-				ExpiresAt = DateTimeOffset.MinValue
+				ExpiresAt = DateTimeOffset.MinValue,
+				Status = AdStatus.Pending,
+				SubCategoryValues = new List<AdSubCategoryValue>(),
+				Images = new List<AdImage>()
 			};
 
-			////newAd.Status = Core.Enums.AdStatus.Pending; // veziyyeti gozleyen edirik ki , admin tesdiqlesin. // helelik deactive edilib.
+			//newAd.Status = AdStatus.Pending; // veziyyeti gozleyen edirik ki , admin tesdiqlesin. // helelik deactive edilib.
 			//newAd.Status = Core.Enums.AdStatus.Active; // veziyyeti active edirik ki , tediqlenme olmadan , yoxlaya bilek.
 
-			newAd.Status = Core.Enums.AdStatus.Pending; // veziyyeti gozleyen edirik ki , admin tesdiqlesin.
-
-			newAd.SubCategoryValues = new List<AdSubCategoryValue>();
+			//newAd.SubCategoryValues = new List<AdSubCategoryValue>();
 
 			foreach (var item in request.SubCategoryValues)
 			{
@@ -131,12 +141,13 @@ public class CreateAdCommandHandler : IRequestHandler<CreateAdCommand, Result>
 				});
 			}
 
-			newAd.Images = new List<AdImage>();
+			//newAd.Images = new List<AdImage>();
 
-			// Image service created. use !
+			// Image service use !
 
-			int imageSortOrder = 0;
+			//int imageSortOrder = 0;
 
+			/*
 			List<string> lstImages = [
 			"https://upload.wikimedia.org/wikipedia/commons/8/86/BMW_G60_520i_1X7A2443.jpg",
 			"https://www.bmw-m.com/content/dam/bmw/marketBMW_M/www_bmw-m_com/all-models/model-navigation/bmw-m340i-xdrive-sedan-flyout-new.png",
@@ -149,6 +160,32 @@ public class CreateAdCommandHandler : IRequestHandler<CreateAdCommand, Result>
 					Url = i,
 					SortOrder = imageSortOrder++
 				});
+			*/
+
+			//-----
+
+			if (request.Images is null || request.Images.Count < 1)
+				throw new ArgumentNullException(nameof(request.Images), "Ad must have images.");
+
+			int imageSortOrder = 0;
+
+			foreach (var imageFile in request.Images)
+			{
+				var uploadResult = await _adImageService.ResizeAndUploadAsync(imageFile, _containerName);
+
+				if (!uploadResult.Error)
+				{
+					newAd.Images.Add(new AdImage
+					{
+						AdId = newAd.Id,
+						Url = uploadResult.Url!,
+						BlobName = uploadResult.BlobName!,
+						SortOrder = imageSortOrder++
+					});
+				}
+			}
+
+			//-----
 
 			await _writeRepository.AddAsync(newAd);
 			await _adSubCategoryWriteRepository.AddRangeAsync(newAd.SubCategoryValues.ToList());

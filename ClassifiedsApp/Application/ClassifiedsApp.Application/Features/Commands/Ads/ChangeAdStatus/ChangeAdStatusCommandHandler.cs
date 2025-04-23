@@ -22,10 +22,8 @@ public class ChangeAdStatusCommandHandler : IRequestHandler<ChangeAdStatusComman
 	{
 		try
 		{
-			Ad ad = await _adReadRepository.GetAdByIdWithIncludesAsync(request.AdId);
-
-			if (ad is null)
-				throw new KeyNotFoundException("Ad Not Found.");
+			Ad ad = await _adReadRepository.GetAdByIdWithIncludesAsync(request.AdId)
+					?? throw new KeyNotFoundException("Ad Not Found.");
 
 			ad.Status = request.NewAdStatus;
 			ad.UpdatedAt = DateTimeOffset.UtcNow;

@@ -1,4 +1,5 @@
-﻿using ClassifiedsApp.Application.Interfaces.Repositories.AdImages;
+﻿using Azure.Storage.Blobs;
+using ClassifiedsApp.Application.Interfaces.Repositories.AdImages;
 using ClassifiedsApp.Application.Interfaces.Repositories.Ads;
 using ClassifiedsApp.Application.Interfaces.Repositories.Categories;
 using ClassifiedsApp.Application.Interfaces.Repositories.Chats;
@@ -32,8 +33,7 @@ namespace ClassifiedsApp.Infrastructure;
 
 public static class ServiceRegistration
 {
-	public static void AddInfrastructureServices(this IServiceCollection services,
-													IConfiguration configuration)
+	public static void AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration)
 	{
 		services.AddDbContext<ApplicationDbContext>(options =>
 		{
@@ -42,16 +42,24 @@ public static class ServiceRegistration
 
 		services.AddIdentity<AppUser, AppRole>(options =>
 		{
-			options.Password.RequireDigit = true;
+			//options.Password.RequireDigit = true;
+			//options.Password.RequireLowercase = true;
+			//options.Password.RequireUppercase = true;
+			//options.Password.RequireNonAlphanumeric = true;
+			//options.Password.RequiredLength = 6;
+
+			options.Password.RequireDigit = false;
 			options.Password.RequireLowercase = true;
-			options.Password.RequireUppercase = true;
-			options.Password.RequireNonAlphanumeric = true;
-			options.Password.RequiredLength = 6;
+			options.Password.RequireUppercase = false;
+			options.Password.RequireNonAlphanumeric = false;
+			options.Password.RequiredLength = 3;
 
 			options.User.RequireUniqueEmail = true;
 		})
 		.AddEntityFrameworkStores<ApplicationDbContext>()
 		.AddDefaultTokenProviders();
+
+		services.AddSingleton(x => new BlobServiceClient(configuration.GetConnectionString("AzureBlobStorage")));
 
 
 		// caching usage
@@ -134,8 +142,11 @@ public static class ServiceRegistration
 
 		services.AddScoped<IChatMessageReadRepository, ChatMessageReadRepository>();
 		services.AddScoped<IChatMessageWriteRepository, ChatMessageWriteRepository>();
+
 		services.AddScoped<IChatRoomReadRepository, ChatRoomReadRepository>();
 		services.AddScoped<IChatRoomWriteRepository, ChatRoomWriteRepository>();
+
+		services.AddScoped<IAdImageService, AdImageService>();
 
 		services.AddScoped<TestJobService>(); // add job service.
 	}

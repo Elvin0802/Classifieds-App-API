@@ -6,5 +6,4 @@ namespace ClassifiedsApp.Application.Features.Queries.Chats.GetChatMessagesByCha
 public class GetChatMessagesByChatRoomQuery : IRequest<Result<GetChatMessagesByChatRoomQueryResponse>>
 {
 	public Guid ChatRoomId { get; set; }
-	public Guid UserId { get; set; }
 }

@@ -1,4 +1,13 @@
-﻿using MediatR;
+﻿using ClassifiedsApp.Application.Common.Results;
+using ClassifiedsApp.Application.Dtos.Chats;
+using ClassifiedsApp.Application.Features.Commands.Chats.CreateChatRoom;
+using ClassifiedsApp.Application.Features.Commands.Chats.MarkMessagesAsRead;
+using ClassifiedsApp.Application.Features.Commands.Chats.SendMessage;
+using ClassifiedsApp.Application.Features.Queries.Chats.GetAdChatInfo;
+using ClassifiedsApp.Application.Features.Queries.Chats.GetChatMessagesByChatRoom;
+using ClassifiedsApp.Application.Features.Queries.Chats.GetChatRoom;
+using ClassifiedsApp.Application.Features.Queries.Chats.GetChatRoomsByUser;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ClassifiedsApp.API.Controllers;
@@ -7,30 +16,53 @@ namespace ClassifiedsApp.API.Controllers;
 [ApiController]
 public class ChatController : ControllerBase
 {
-	private readonly IMediator _mediator;
+	readonly IMediator _mediator;
 
 	public ChatController(IMediator mediator)
 	{
 		_mediator = mediator;
 	}
 
-	//[HttpPost("rooms")]
-	//public async Task<IActionResult> CreateChatRoom(CreateChatRoomCommand command)
-	//{
-	//	var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-	//	if (string.IsNullOrEmpty(userId) || !Guid.TryParse(userId, out var userGuid))
-	//		return Unauthorized();
+	[HttpPost("[action]")]
+	public async Task<ActionResult<Result<ChatRoomDto>>> CreateChatRoom(CreateChatRoomCommand command)
+	{
+		return Ok(await _mediator.Send(command));
+	}
 
-	//	command.BuyerId = userGuid;
-	//	var result = await _mediator.Send(command);
+	[HttpPost("[action]")]
+	public async Task<ActionResult<Result<GetChatRoomsByUserQueryResponse>>> GetChatRooms()
+	{
+		return Ok(await _mediator.Send(new GetChatRoomsByUserQuery()));
+	}
 
-	//	if (!result.IsSuccess)
-	//		return BadRequest(result.Error);
+	[HttpPost("[action]")]
+	public async Task<ActionResult<Result<GetChatRoomQueryResponse>>> GetChatRoom([FromBody] GetChatRoomQuery query)
+	{
+		return Ok(await _mediator.Send(query));
+	}
 
-	//	return Ok(result.Value);
+	[HttpPost("[action]")]
+	public async Task<ActionResult<Result<GetChatMessagesByChatRoomQueryResponse>>> GetChatMessages([FromBody] GetChatMessagesByChatRoomQuery query)
+	{
+		return Ok(await _mediator.Send(query));
+	}
 
+	[HttpPost("[action]")]
+	public async Task<ActionResult<Result<GetAdChatInfoQueryResponse>>> GetAdChatInfo([FromBody] GetAdChatInfoQuery query)
+	{
+		return Ok(await _mediator.Send(query));
+	}
 
-	//}
+	[HttpPost("[action]")]
+	public async Task<ActionResult<Result<ChatMessageDto>>> SendMessage([FromBody] SendMessageCommand command)
+	{
+		return Ok(await _mediator.Send(command));
+	}
 
+	[HttpPost("[action]")]
+	public async Task<ActionResult<Result>> MarkMessagesAsRead([FromBody] MarkMessagesAsReadCommand command)
+	{
+		return Ok(await _mediator.Send(command));
+	}
 
 }

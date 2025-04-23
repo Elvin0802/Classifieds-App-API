@@ -21,6 +21,9 @@ public static class Configuration
 			}
 
 			return configurationManager.GetConnectionString("Default")!;
+
+			//return configurationManager.GetConnectionString("AzureTeacherDb")!;
+			//return configurationManager.GetConnectionString("AzureDb")!;
 		}
 	}
 }

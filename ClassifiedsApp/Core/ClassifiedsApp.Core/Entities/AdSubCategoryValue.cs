@@ -11,4 +11,5 @@ public class AdSubCategoryValue : BaseEntity
 
 	public Guid SubCategoryId { get; set; }
 	public SubCategory SubCategory { get; set; }
+
 }

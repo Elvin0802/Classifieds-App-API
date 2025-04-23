@@ -2,6 +2,7 @@
 using ClassifiedsApp.Application.Dtos.Chats;
 using ClassifiedsApp.Application.Interfaces.Repositories.Ads;
 using ClassifiedsApp.Application.Interfaces.Repositories.Chats;
+using ClassifiedsApp.Application.Interfaces.Services.Users;
 using ClassifiedsApp.Core.Entities;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
@@ -13,17 +14,20 @@ public class CreateChatRoomCommandHandler : IRequestHandler<CreateChatRoomComman
 	readonly IChatRoomReadRepository _chatRoomReadRepository;
 	readonly IChatRoomWriteRepository _chatRoomWriteRepository;
 	readonly IAdReadRepository _adReadRepository;
+	readonly ICurrentUserService _currentUserService;
 	readonly UserManager<AppUser> _userManager;
 
 	public CreateChatRoomCommandHandler(IChatRoomReadRepository chatRoomReadRepository,
 										IChatRoomWriteRepository chatRoomWriteRepository,
 										IAdReadRepository adReadRepository,
-										UserManager<AppUser> userManager)
+										UserManager<AppUser> userManager,
+										ICurrentUserService currentUserService)
 	{
 		_chatRoomReadRepository = chatRoomReadRepository;
 		_chatRoomWriteRepository = chatRoomWriteRepository;
 		_adReadRepository = adReadRepository;
 		_userManager = userManager;
+		_currentUserService = currentUserService;
 	}
 
 	public async Task<Result<ChatRoomDto>> Handle(CreateChatRoomCommand request, CancellationToken cancellationToken)
@@ -33,23 +37,23 @@ public class CreateChatRoomCommandHandler : IRequestHandler<CreateChatRoomComman
 			var ad = await _adReadRepository.GetAdByIdWithIncludesAsync(request.AdId, false)
 					 ?? throw new KeyNotFoundException("Ad not found.");
 
-			if (ad.AppUserId == request.BuyerId)
+			if (ad.AppUserId == _currentUserService.UserId)
 				throw new Exception("User cannot chat with yourself.");
 
 			// Check if chat room already exists
 			var existingChatRoom = _chatRoomReadRepository
-									.GetWhere(x => x.AdId == request.AdId && x.BuyerId == request.BuyerId && x.SellerId == ad.AppUserId)
+									.GetWhere(x => x.AdId == request.AdId && x.BuyerId == _currentUserService.UserId && x.SellerId == ad.AppUserId)
 									.ToList();
 
 			if (existingChatRoom.Count != 0)
 				throw new Exception("Chat room already exists");
 
-			var buyer = await _userManager.FindByIdAsync(request.BuyerId.ToString())
+			var buyer = await _userManager.FindByIdAsync(_currentUserService.UserId.ToString()!)
 						?? throw new KeyNotFoundException("User not found.");
 
 			var chatRoom = new ChatRoom()
 			{
-				BuyerId = request.BuyerId,
+				BuyerId = _currentUserService.UserId!.Value,
 				SellerId = ad.AppUserId,
 				AdId = request.AdId
 			};

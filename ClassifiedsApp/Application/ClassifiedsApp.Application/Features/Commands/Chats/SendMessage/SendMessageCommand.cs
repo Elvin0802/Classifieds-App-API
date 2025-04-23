@@ -7,6 +7,5 @@ namespace ClassifiedsApp.Application.Features.Commands.Chats.SendMessage;
 public class SendMessageCommand : IRequest<Result<ChatMessageDto>>
 {
 	public Guid ChatRoomId { get; set; }
-	public Guid SenderId { get; set; }
 	public string Content { get; set; } = string.Empty;
 }

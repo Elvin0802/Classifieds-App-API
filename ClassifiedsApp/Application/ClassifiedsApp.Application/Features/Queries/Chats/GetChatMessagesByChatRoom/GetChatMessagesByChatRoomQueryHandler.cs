@@ -1,64 +1,76 @@
-﻿//using ClassifiedsApp.Application.Common.Results;
-//using ClassifiedsApp.Application.Dtos.Chats;
-//using ClassifiedsApp.Core.Entities;
-//using MediatR;
-//using System;
-//using System.Collections.Generic;
-//using System.Linq;
-//using System.Text;
-//using System.Threading.Tasks;
+﻿using ClassifiedsApp.Application.Common.Results;
+using ClassifiedsApp.Application.Dtos.Chats;
+using ClassifiedsApp.Application.Interfaces.Repositories.Chats;
+using ClassifiedsApp.Application.Interfaces.Services.Users;
+using MediatR;
+using Microsoft.EntityFrameworkCore;
 
-//namespace ClassifiedsApp.Application.Features.Queries.Chats.GetChatMessagesByChatRoom;
+namespace ClassifiedsApp.Application.Features.Queries.Chats.GetChatMessagesByChatRoom;
 
-//public class GetChatMessagesByChatRoomQueryHandler : IRequestHandler<GetChatMessagesByChatRoomQuery, Result<List<ChatMessageDto>>>
-//{
-//	private readonly IRepository<ChatRoom> _chatRoomRepository;
-//	private readonly IRepository<ChatMessage> _chatMessageRepository;
-//	private readonly IRepository<AppUser> _userRepository;
+public class GetChatMessagesByChatRoomQueryHandler : IRequestHandler<GetChatMessagesByChatRoomQuery, Result<GetChatMessagesByChatRoomQueryResponse>>
+{
+	readonly IChatRoomReadRepository _chatRoomReadRepository;
+	readonly IChatMessageReadRepository _chatMessageReadRepository;
+	readonly ICurrentUserService _currentUserService;
 
-//	public GetChatMessagesByChatRoomQueryHandler(
-//		IRepository<ChatRoom> chatRoomRepository,
-//		IRepository<ChatMessage> chatMessageRepository,
-//		IRepository<AppUser> userRepository)
-//	{
-//		_chatRoomRepository = chatRoomRepository;
-//		_chatMessageRepository = chatMessageRepository;
-//		_userRepository = userRepository;
-//	}
 
-//	public async Task<Result<List<ChatMessageDto>>> Handle(GetChatMessagesByChatRoomQuery request, CancellationToken cancellationToken)
-//	{
-//		var chatRoom = await _chatRoomRepository.GetByIdAsync(request.ChatRoomId);
-//		if (chatRoom == null)
-//			return Result<List<ChatMessageDto>>.Failure("Chat room not found");
+	public GetChatMessagesByChatRoomQueryHandler(IChatRoomReadRepository chatRoomReadRepository,
+												 IChatMessageReadRepository chatMessageReadRepository,
+												 ICurrentUserService currentUserService)
+	{
+		_chatRoomReadRepository = chatRoomReadRepository;
+		_chatMessageReadRepository = chatMessageReadRepository;
+		_currentUserService = currentUserService;
+	}
 
-//		if (chatRoom.BuyerId != request.UserId && chatRoom.SellerId != request.UserId)
-//			return Result<List<ChatMessageDto>>.Failure("User is not part of this chat room");
+	public async Task<Result<GetChatMessagesByChatRoomQueryResponse>> Handle(GetChatMessagesByChatRoomQuery request, CancellationToken cancellationToken)
+	{
+		try
+		{
+			var chatRoom = await _chatRoomReadRepository.GetByIdAsync(request.ChatRoomId)
+							?? throw new KeyNotFoundException("Chat room not found.");
 
-//		var messages = await _chatMessageRepository.ListWithIncludeAsync(
-//			m => m.AdId == chatRoom.AdId &&
-//				(m.SenderId == chatRoom.BuyerId || m.SenderId == chatRoom.SellerId) &&
-//				(m.ReceiverId == chatRoom.BuyerId || m.ReceiverId == chatRoom.SellerId),
-//			m => m.Sender);
+			if (chatRoom.BuyerId != _currentUserService.UserId!.Value && chatRoom.SellerId != _currentUserService.UserId.Value)
+				throw new Exception("User is not part of this chat room.");
 
-//		// Sort by creation time
-//		messages = messages.OrderBy(m => m.CreatedAt).ToList();
+			var messages = _chatMessageReadRepository.Table
+							.Where(m => m.AdId == chatRoom.AdId
+									 && (m.SenderId == chatRoom.BuyerId || m.SenderId == chatRoom.SellerId)
+									 && (m.ReceiverId == chatRoom.BuyerId || m.ReceiverId == chatRoom.SellerId))
+							.Include(m => m.Sender)
+							.ToList();
 
-//		var messageDtos = new List<ChatMessageDto>();
+			// Sort by creation time
+			messages = messages.OrderBy(m => m.CreatedAt).ToList();
 
-//		foreach (var message in messages)
-//		{
-//			messageDtos.Add(new ChatMessageDto
-//			{
-//				Id = message.Id,
-//				Content = message.Content,
-//				SenderId = message.SenderId,
-//				SenderName = message.Sender.Name,
-//				CreatedAt = message.CreatedAt,
-//				IsRead = message.IsRead
-//			});
-//		}
+			var messageDtos = new List<ChatMessageDto>();
 
-//		return Result<List<ChatMessageDto>>.Success(messageDtos);
-//	}
-//}
+			foreach (var message in messages)
+			{
+				messageDtos.Add(new ChatMessageDto
+				{
+					Id = message.Id,
+					Content = message.Content,
+					SenderId = message.SenderId,
+					SenderName = message.Sender.Name,
+					CreatedAt = message.CreatedAt,
+					IsRead = message.IsRead
+				});
+			}
+
+			var data = new GetChatMessagesByChatRoomQueryResponse()
+			{
+				Items = messageDtos,
+				PageNumber = 1,
+				PageSize = messageDtos.Count,
+				TotalCount = messageDtos.Count
+			};
+
+			return Result.Success(data, "Chat Messages retrieved successfully.");
+		}
+		catch (Exception ex)
+		{
+			return Result.Failure<GetChatMessagesByChatRoomQueryResponse>($"Failed to retrieve Chat Messages : {ex.Message}");
+		}
+	}
+}

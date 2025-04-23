@@ -1,6 +1,7 @@
 ﻿using ClassifiedsApp.Application.Common.Results;
 using ClassifiedsApp.Application.Dtos.Chats;
 using ClassifiedsApp.Application.Interfaces.Repositories.Chats;
+using ClassifiedsApp.Application.Interfaces.Services.Users;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,12 +11,15 @@ public class GetChatRoomsByUserQueryHandler : IRequestHandler<GetChatRoomsByUser
 {
 	readonly IChatRoomReadRepository _chatRoomReadRepository;
 	readonly IChatMessageReadRepository _сhatMessageReadRepository;
+	readonly ICurrentUserService _currentUserService;
 
 	public GetChatRoomsByUserQueryHandler(IChatRoomReadRepository chatRoomReadRepository,
-											IChatMessageReadRepository сhatMessageReadRepository)
+											IChatMessageReadRepository сhatMessageReadRepository,
+											ICurrentUserService currentUserService)
 	{
 		_chatRoomReadRepository = chatRoomReadRepository;
 		_сhatMessageReadRepository = сhatMessageReadRepository;
+		_currentUserService = currentUserService;
 	}
 
 	public async Task<Result<GetChatRoomsByUserQueryResponse>> Handle(GetChatRoomsByUserQuery request, CancellationToken cancellationToken)
@@ -23,7 +27,7 @@ public class GetChatRoomsByUserQueryHandler : IRequestHandler<GetChatRoomsByUser
 		try
 		{
 			var chatRooms = _chatRoomReadRepository.Table
-							.Where(x => x.BuyerId == request.UserId || x.SellerId == request.UserId)
+							.Where(x => x.BuyerId == _currentUserService.UserId!.Value || x.SellerId == _currentUserService.UserId.Value)
 							.Include(x => x.Buyer)
 							.Include(x => x.Seller)
 							.Include(x => x.Ad)
@@ -34,7 +38,7 @@ public class GetChatRoomsByUserQueryHandler : IRequestHandler<GetChatRoomsByUser
 			foreach (var chatRoom in chatRooms)
 			{
 				var unreadCount = await _сhatMessageReadRepository.Table
-									.CountAsync(m => m.ReceiverId == request.UserId
+									.CountAsync(m => m.ReceiverId == _currentUserService.UserId!.Value
 												  && !m.IsRead
 												  && m.AdId == chatRoom.AdId,
 												  cancellationToken: cancellationToken);

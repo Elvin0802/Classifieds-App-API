@@ -1,4 +1,5 @@
 ﻿using Azure;
+using ClassifiedsApp.Application.Common.Consts;
 using ClassifiedsApp.Application.Common.Results;
 using ClassifiedsApp.Application.Interfaces.Repositories.Ads;
 using ClassifiedsApp.Application.Interfaces.Services.Ads;
@@ -12,9 +13,6 @@ public class DeleteAdCommandHandler : IRequestHandler<DeleteAdCommand, Result>
 	readonly IAdWriteRepository _adWriteRepository;
 	readonly IAdReadRepository _adReadRepository;
 	readonly IAdImageService _adImageService;
-
-	// * create consts and add this to global. ( n = AzureNames.ContName; )
-	readonly string _containerName = "api-ad-images";
 
 	public DeleteAdCommandHandler(IAdWriteRepository adWriteRepository,
 								  IAdReadRepository adReadRepository,
@@ -46,7 +44,7 @@ public class DeleteAdCommandHandler : IRequestHandler<DeleteAdCommand, Result>
 			foreach (var image in ad.Images)
 			{
 				if (!string.IsNullOrEmpty(image.BlobName))
-					await _adImageService.DeleteAsync(image.BlobName, _containerName);
+					await _adImageService.DeleteAsync(image.BlobName, AzureContainerNames.ContainerName);
 			}
 
 			if (!await _adWriteRepository.RemoveAsync(ad.Id))

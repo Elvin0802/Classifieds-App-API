@@ -1,4 +1,5 @@
-﻿using ClassifiedsApp.Application.Common.Results;
+﻿using ClassifiedsApp.Application.Common.Consts;
+using ClassifiedsApp.Application.Common.Results;
 using ClassifiedsApp.Application.Interfaces.Repositories.Ads;
 using ClassifiedsApp.Application.Interfaces.Services.Ads;
 using ClassifiedsApp.Application.Interfaces.Services.Users;
@@ -14,10 +15,6 @@ public class CreateAdCommandHandler : IRequestHandler<CreateAdCommand, Result>
 	readonly IAdSubCategoryValueWriteRepository _adSubCategoryWriteRepository;
 	readonly ICurrentUserService _currentUserService;
 	readonly IAdImageService _adImageService;
-
-	// * create consts and add this to global. ( n = AzureNames.ContName; )
-	readonly string _containerName = "api-ad-images";
-
 
 	public CreateAdCommandHandler(IAdWriteRepository writeRepository,
 								  IAdSubCategoryValueWriteRepository adSubCategoryWriteRepository,
@@ -171,7 +168,7 @@ public class CreateAdCommandHandler : IRequestHandler<CreateAdCommand, Result>
 
 			foreach (var imageFile in request.Images)
 			{
-				var uploadResult = await _adImageService.ResizeAndUploadAsync(imageFile, _containerName);
+				var uploadResult = await _adImageService.ResizeAndUploadAsync(imageFile, AzureContainerNames.ContainerName);
 
 				if (!uploadResult.Error)
 				{

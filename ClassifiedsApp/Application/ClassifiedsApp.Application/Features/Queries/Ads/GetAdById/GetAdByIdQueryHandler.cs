@@ -6,7 +6,6 @@ using ClassifiedsApp.Application.Dtos.Auth.Users;
 using ClassifiedsApp.Application.Dtos.Categories;
 using ClassifiedsApp.Application.Dtos.Locations;
 using ClassifiedsApp.Application.Interfaces.Repositories.Ads;
-using ClassifiedsApp.Application.Interfaces.Services.Users;
 using MediatR;
 
 namespace ClassifiedsApp.Application.Features.Queries.Ads.GetAdById;
@@ -16,17 +15,14 @@ public class GetAdByIdQueryHandler : IRequestHandler<GetAdByIdQuery, Result<GetA
 	readonly IAdReadRepository _readRepository;
 	readonly IAdWriteRepository _writeRepository;
 	readonly IMapper _mapper;
-	readonly ICurrentUserService _currentUserService;
 
 	public GetAdByIdQueryHandler(IAdReadRepository readRepository,
 								 IAdWriteRepository writeRepository,
-								 IMapper mapper,
-								 ICurrentUserService currentUserService)
+								 IMapper mapper)
 	{
 		_readRepository = readRepository;
 		_writeRepository = writeRepository;
 		_mapper = mapper;
-		_currentUserService = currentUserService;
 	}
 
 	public async Task<Result<GetAdByIdQueryResponse>> Handle(GetAdByIdQuery request, CancellationToken cancellationToken)
@@ -60,11 +56,13 @@ public class GetAdByIdQueryHandler : IRequestHandler<GetAdByIdQuery, Result<GetA
 					Location = _mapper.Map<LocationDto>(item.Location),
 					AppUser = _mapper.Map<AppUserDto>(item.AppUser),
 
-					IsOwner = item.AppUserId == _currentUserService.UserId,
+					IsOwner = item.AppUserId == request.CurrentAppUserId,
 					IsNew = item.IsNew,
 					IsFeatured = item.IsFeatured,
 					FeatureEndDate = item.FeatureEndDate,
 					SelectorUsersCount = item.SelectorUsers.Count,
+					IsSelected = request.CurrentAppUserId.HasValue &&
+								 item.SelectorUsers.Any(su => su.AppUserId == request.CurrentAppUserId.Value),
 
 					Images = item.Images.Select(img => _mapper.Map<AdImageDto>(img)).ToList(),
 					AdSubCategoryValues = item.SubCategoryValues.Select(ascv => _mapper.Map<AdSubCategoryValueDto>(ascv)).ToList()

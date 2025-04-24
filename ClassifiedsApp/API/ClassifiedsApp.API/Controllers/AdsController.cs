@@ -29,7 +29,7 @@ public class AdsController : ControllerBase
 
 	[HttpPost("[action]")]
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin,User")]
-	public async Task<ActionResult<Result>> Create([FromBody] CreateAdCommand command)
+	public async Task<ActionResult<Result>> Create([FromForm] CreateAdCommand command)
 	{
 		return Ok(await _mediator.Send(command));
 	}

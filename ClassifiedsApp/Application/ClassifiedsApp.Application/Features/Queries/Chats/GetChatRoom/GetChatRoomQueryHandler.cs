@@ -28,7 +28,7 @@ public class GetChatRoomQueryHandler : IRequestHandler<GetChatRoomQuery, Result<
 	{
 		try
 		{
-			var chatRoom = await _chatRoomReadRepository.GetByIdAsync(request.ChatRoomId)
+			var chatRoom = await _chatRoomReadRepository.GetByIdAsync(request.Id)
 						   ?? throw new KeyNotFoundException("Chat room not found.");
 
 			if (chatRoom.BuyerId != _currentUserService.UserId && chatRoom.SellerId != _currentUserService.UserId)

@@ -1,7 +1,6 @@
 ﻿using ClassifiedsApp.Application.Common.Results;
 using ClassifiedsApp.Application.Dtos.Ads;
 using ClassifiedsApp.Application.Interfaces.Repositories.Ads;
-using ClassifiedsApp.Application.Interfaces.Services.Users;
 using ClassifiedsApp.Core.Entities;
 using ClassifiedsApp.Core.Enums;
 using MediatR;
@@ -12,12 +11,10 @@ namespace ClassifiedsApp.Application.Features.Queries.Ads.GetAllAds;
 public class GetAllAdsQueryHandler : IRequestHandler<GetAllAdsQuery, Result<GetAllAdsQueryResponse>>
 {
 	private readonly IAdReadRepository _repository;
-	private readonly ICurrentUserService _currentUserService;
 
-	public GetAllAdsQueryHandler(IAdReadRepository repository, ICurrentUserService currentUserService)
+	public GetAllAdsQueryHandler(IAdReadRepository repository)
 	{
 		_repository = repository;
-		_currentUserService = currentUserService;
 	}
 
 	public async Task<Result<GetAllAdsQueryResponse>> Handle(GetAllAdsQuery request, CancellationToken cancellationToken)
@@ -49,15 +46,18 @@ public class GetAllAdsQueryHandler : IRequestHandler<GetAllAdsQuery, Result<GetA
 				request.PageSize = query.Count();
 			}
 
-			// get vip ads.
-			if (request.IsFeatured)
+			if (!(request.SearchedAppUserId.HasValue))
 			{
-				query = query.Where(ad => ad.IsFeatured && ad.FeatureEndDate > DateTimeOffset.UtcNow)
-							 .OrderByDescending(ad => ad.FeaturePriority)
-							 .ThenByDescending(ad => ad.FeatureStartDate);
+				// get vip ads.
+				if (request.IsFeatured)
+				{
+					query = query.Where(ad => ad.IsFeatured && ad.FeatureEndDate > DateTimeOffset.UtcNow)
+								 .OrderByDescending(ad => ad.FeaturePriority)
+								 .ThenByDescending(ad => ad.FeatureStartDate);
+				}
+				else
+					query = query.Where(ad => ad.IsFeatured == false);
 			}
-			else
-				query = query.Where(ad => ad.IsFeatured == false);
 
 			// Apply search filter
 			var searchTerm = request.SearchTitle?.Trim().ToLower();
@@ -109,7 +109,7 @@ public class GetAllAdsQueryHandler : IRequestHandler<GetAllAdsQuery, Result<GetA
 					IsNew = p.IsNew,
 					IsFeatured = p.IsFeatured,
 					MainImageUrl = p.Images.FirstOrDefault(img => img.SortOrder == 0)!.Url,
-					IsSelected = _currentUserService.UserId.HasValue && p.SelectorUsers.Any(su => su.AppUserId == _currentUserService.UserId.Value),
+					IsSelected = request.CurrentAppUserId.HasValue && p.SelectorUsers.Any(su => su.AppUserId == request.CurrentAppUserId.Value),
 					UpdatedAt = p.UpdatedAt,
 				})
 				.ToListAsync(cancellationToken);

@@ -8,12 +8,15 @@ using ClassifiedsApp.Application.Features.Queries.Chats.GetChatMessagesByChatRoo
 using ClassifiedsApp.Application.Features.Queries.Chats.GetChatRoom;
 using ClassifiedsApp.Application.Features.Queries.Chats.GetChatRoomsByUser;
 using MediatR;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ClassifiedsApp.API.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
+[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin,User")]
 public class ChatController : ControllerBase
 {
 	readonly IMediator _mediator;

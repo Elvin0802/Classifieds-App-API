@@ -22,7 +22,7 @@ builder.Host.UseSerilog((context, config) =>
 	config.ReadFrom.Configuration(context.Configuration);
 });
 
-builder.Services.AuthenticationAndAuthorization(builder.Configuration);
+builder.Services.AddAuthenticationAndAuthorization(builder.Configuration);
 
 builder.Services.AddApplicationServices();
 builder.Services.AddInfrastructureServices(builder.Configuration);
@@ -63,7 +63,7 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-app.MapHub<ChatHub>("/chatHub");
+app.MapHub<ChatHub>("api/chatHub");
 
 // Adding seed data.
 using (var scope = app.Services.CreateScope())

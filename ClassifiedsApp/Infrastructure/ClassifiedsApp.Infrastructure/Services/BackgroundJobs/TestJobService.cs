@@ -1,5 +1,6 @@
 ﻿using ClassifiedsApp.Application.Interfaces.Repositories.Ads;
 using ClassifiedsApp.Application.Interfaces.Services.BackgroundJobs;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace ClassifiedsApp.Infrastructure.Services.BackgroundJobs;
@@ -21,10 +22,9 @@ public class TestJobService : IBackgroundJob
 
 		try
 		{
-			var items = _repository.GetAll(false);
+			var itemsCount = (await _repository.GetAll(false).ToListAsync()).Count;
 
-			foreach (var item in items)
-				_logger.LogInformation("Processed item {ItemId}", item.Id);
+			_logger.LogInformation("Total item count = {itemsCount}", itemsCount);
 		}
 		catch (Exception ex)
 		{

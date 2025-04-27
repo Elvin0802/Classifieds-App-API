@@ -48,7 +48,8 @@ public class SendMessageCommandHandler : IRequestHandler<SendMessageCommand, Res
 				Content = request.Content,
 				SenderId = _currentUserService.UserId!.Value,
 				ReceiverId = receiverId,
-				AdId = chatRoom.AdId
+				AdId = chatRoom.AdId,
+				ChatRoomId = chatRoom.Id,
 			};
 
 			await _chatMessageWriteRepository.AddAsync(message);

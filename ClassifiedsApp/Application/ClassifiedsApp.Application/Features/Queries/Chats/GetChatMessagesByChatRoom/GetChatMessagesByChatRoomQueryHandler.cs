@@ -38,6 +38,7 @@ public class GetChatMessagesByChatRoomQueryHandler : IRequestHandler<GetChatMess
 									 && (m.SenderId == chatRoom.BuyerId || m.SenderId == chatRoom.SellerId)
 									 && (m.ReceiverId == chatRoom.BuyerId || m.ReceiverId == chatRoom.SellerId))
 							.Include(m => m.Sender)
+							.Include(m => m.Receiver)
 							.ToList();
 
 			// Sort by creation time
@@ -52,6 +53,8 @@ public class GetChatMessagesByChatRoomQueryHandler : IRequestHandler<GetChatMess
 					Id = message.Id,
 					Content = message.Content,
 					SenderId = message.SenderId,
+					ReceiverId = message.ReceiverId,
+					ChatRoomId = chatRoom.Id,
 					SenderName = message.Sender.Name,
 					CreatedAt = message.CreatedAt,
 					IsRead = message.IsRead

@@ -18,7 +18,7 @@ public class GetReportByIdQueryHandler : IRequestHandler<GetReportByIdQuery, Res
 	{
 		try
 		{
-			var report = await _repository.GetByIdAsync(request.Id);
+			var report = await _repository.GetByIdWithIncludesAsync(request.Id);
 
 			if (report is null) throw new KeyNotFoundException("Report not found.");
 
@@ -32,8 +32,8 @@ public class GetReportByIdQueryHandler : IRequestHandler<GetReportByIdQuery, Res
 				Reason = report.Reason,
 				Description = report.Description,
 				Status = report.Status,
-				ReviewedByUserId = report.ReviewedByUserId,
-				ReviewedByUserName = report.ReviewedByUser!.Name,
+				ReviewedByUserId = report.ReviewedByUserId is null ? Guid.Empty : report.ReviewedByUserId,
+				ReviewedByUserName = report.ReviewedByUser is null ? "not reviewed" : report.ReviewedByUser!.Name,
 				ReviewedAt = report.ReviewedAt,
 				ReviewNotes = report.ReviewNotes,
 				CreatedAt = report.CreatedAt,

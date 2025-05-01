@@ -12,6 +12,7 @@ public class AdDto : BaseEntityDto
 	public string Description { get; set; }
 	public decimal Price { get; set; }
 	public bool IsNew { get; set; }
+	public bool IsSelected { get; set; }
 	public bool IsFeatured { get; set; } = false;
 	public bool IsOwner { get; set; } = false;
 	public DateTimeOffset ExpiresAt { get; set; }

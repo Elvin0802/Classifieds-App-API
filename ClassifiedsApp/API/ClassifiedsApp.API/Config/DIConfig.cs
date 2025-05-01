@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Quartz;
+using Serilog;
 using System.Security.Claims;
 using System.Text;
 
@@ -56,9 +57,7 @@ public static class DIConfig
 		return services;
 	}
 
-	public static IServiceCollection AuthenticationAndAuthorization(
-		this IServiceCollection services,
-		IConfiguration configuration)
+	public static IServiceCollection AddAuthenticationAndAuthorization(this IServiceCollection services, IConfiguration configuration)
 	{
 		services.Configure<IdentityOptions>(options =>
 		{
@@ -94,26 +93,65 @@ public static class DIConfig
 				RoleClaimType = ClaimTypes.Role
 			};
 
+			//options.Events = new JwtBearerEvents
+			//{
+			//	OnMessageReceived = context =>
+			//	{
+			//		if (context.Request.Headers.ContainsKey("Authorization"))
+			//		{
+			//			var header = context.Request.Headers["Authorization"].ToString();
+			//			if (header.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
+			//			{
+			//				context.Token = header.Substring("Bearer ".Length).Trim();
+			//			}
+			//		}
+			//		return Task.CompletedTask;
+			//	},
+			//	OnAuthenticationFailed = context =>
+			//	{
+			//		if (context.Exception.GetType() == typeof(SecurityTokenExpiredException))
+			//		{
+			//			context.Response.Headers.Append("Token-Expired", "true");
+			//		}
+			//		return Task.CompletedTask;
+			//	}
+			//};
+
 			options.Events = new JwtBearerEvents
 			{
 				OnMessageReceived = context =>
 				{
+					// Extract token from Authorization header for regular HTTP requests
 					if (context.Request.Headers.ContainsKey("Authorization"))
 					{
 						var header = context.Request.Headers["Authorization"].ToString();
+
 						if (header.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
-						{
 							context.Token = header.Substring("Bearer ".Length).Trim();
-						}
 					}
+
+					// Extract token from query string for SignalR WebSocket connections
+					var accessToken = context.Request.Query["access_token"];
+
+					// If the request is for the hub
+					var path = context.HttpContext.Request.Path;
+
+					Log.Warning($"SignalR context path , request path = {path}");
+					Log.Warning($"Query for SignalR , context token = {accessToken}");
+
+					if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/api/chatHub"))
+					{
+						context.Token = accessToken;
+						Log.Warning($"SignalR context token changed. new token = {context.Token}");
+					}
+
 					return Task.CompletedTask;
 				},
 				OnAuthenticationFailed = context =>
 				{
 					if (context.Exception.GetType() == typeof(SecurityTokenExpiredException))
-					{
 						context.Response.Headers.Append("Token-Expired", "true");
-					}
+
 					return Task.CompletedTask;
 				}
 			};

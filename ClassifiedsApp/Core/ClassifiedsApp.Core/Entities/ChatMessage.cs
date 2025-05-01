@@ -11,5 +11,7 @@ public class ChatMessage : BaseEntity
 	public AppUser Receiver { get; set; } = null!;
 	public Guid AdId { get; set; }
 	public Ad Ad { get; set; } = null!;
+	public Guid ChatRoomId { get; set; }
+	public ChatRoom ChatRoom { get; set; } = null!;
 	public bool IsRead { get; set; } = false;
 }

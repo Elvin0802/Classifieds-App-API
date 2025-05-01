@@ -7,5 +7,7 @@ public class ChatMessageDto
 	public Guid SenderId { get; set; }
 	public string SenderName { get; set; } = string.Empty;
 	public DateTimeOffset CreatedAt { get; set; }
+	public Guid ChatRoomId { get; set; }
+	public Guid ReceiverId { get; set; }
 	public bool IsRead { get; set; }
 }

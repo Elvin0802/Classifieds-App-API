@@ -4,6 +4,7 @@ using ClassifiedsApp.Infrastructure.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ClassifiedsApp.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250424142902_Mig_6_AdImage_Fix_Azure")]
+    partial class Mig_6_AdImage_Fix_Azure
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -293,7 +296,7 @@ namespace ClassifiedsApp.Infrastructure.Migrations
                     b.Property<DateTimeOffset>("ArchivedAt")
                         .HasColumnType("datetimeoffset");
 
-                    b.Property<Guid>("ChatRoomId")
+                    b.Property<Guid?>("ChatRoomId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Content")
@@ -843,11 +846,9 @@ namespace ClassifiedsApp.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("ClassifiedsApp.Core.Entities.ChatRoom", "ChatRoom")
+                    b.HasOne("ClassifiedsApp.Core.Entities.ChatRoom", null)
                         .WithMany("Messages")
-                        .HasForeignKey("ChatRoomId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ChatRoomId");
 
                     b.HasOne("ClassifiedsApp.Core.Entities.AppUser", "Receiver")
                         .WithMany()
@@ -862,8 +863,6 @@ namespace ClassifiedsApp.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("Ad");
-
-                    b.Navigation("ChatRoom");
 
                     b.Navigation("Receiver");
 

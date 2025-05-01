@@ -29,19 +29,15 @@ public class GetAllCategoriesQueryHandler : IRequestHandler<GetAllCategoriesQuer
 								   .ThenInclude(sc => sc.Options.OrderBy(op => op.SortOrder)) // xususi prop ile siralamaq.
 								   .OrderByDescending(p => p.UpdatedAt); // yeniden kohneye dogru siralamaq.
 
-			var totalCount = await query.CountAsync(cancellationToken);
-
-			var list = await query.Skip((request.PageNumber - 1) * request.PageSize)
-								  .Take(request.PageSize)
-								  .Select(c => _mapper.Map<CategoryDto>(c))
+			var list = await query.Select(c => _mapper.Map<CategoryDto>(c))
 								  .ToListAsync(cancellationToken);
 
 			var data = new GetAllCategoriesQueryResponse
 			{
 				Items = list,
-				PageNumber = request.PageNumber,
-				PageSize = request.PageSize,
-				TotalCount = totalCount
+				PageNumber = 1,
+				PageSize = list.Count,
+				TotalCount = list.Count
 			};
 
 			return Result.Success(data, "Categories retrieved successfully.");

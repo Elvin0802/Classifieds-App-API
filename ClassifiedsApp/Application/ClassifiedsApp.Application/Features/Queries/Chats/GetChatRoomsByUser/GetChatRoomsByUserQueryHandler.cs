@@ -26,12 +26,13 @@ public class GetChatRoomsByUserQueryHandler : IRequestHandler<GetChatRoomsByUser
 	{
 		try
 		{
-			var chatRooms = _chatRoomReadRepository.Table
+			var chatRooms = await _chatRoomReadRepository.Table
 							.Where(x => x.BuyerId == _currentUserService.UserId!.Value || x.SellerId == _currentUserService.UserId.Value)
 							.Include(x => x.Buyer)
 							.Include(x => x.Seller)
 							.Include(x => x.Ad)
-							.Include(x => x.Ad.Images);
+								.ThenInclude(ad => ad.Images)
+							.ToListAsync(cancellationToken: cancellationToken);
 
 			var chatRoomDtos = new List<ChatRoomDto>();
 
@@ -43,11 +44,11 @@ public class GetChatRoomsByUserQueryHandler : IRequestHandler<GetChatRoomsByUser
 												  && m.AdId == chatRoom.AdId,
 												  cancellationToken: cancellationToken);
 
-				var lastMessage = _сhatMessageReadRepository
+				var lastMessage = await _сhatMessageReadRepository
 									.GetWhere(m => m.AdId == chatRoom.AdId
 												&& (m.SenderId == chatRoom.BuyerId || m.SenderId == chatRoom.SellerId)
 												&& (m.ReceiverId == chatRoom.BuyerId || m.ReceiverId == chatRoom.SellerId))
-									.ToList();
+									.ToListAsync(cancellationToken: cancellationToken);
 
 				var lastMessageAt = lastMessage.Count != 0 ? lastMessage.Max(m => m.CreatedAt) : chatRoom.CreatedAt;
 

@@ -28,7 +28,13 @@ public class GetChatRoomQueryHandler : IRequestHandler<GetChatRoomQuery, Result<
 	{
 		try
 		{
-			var chatRoom = await _chatRoomReadRepository.GetByIdAsync(request.ChatRoomId)
+			var chatRoom = await _chatRoomReadRepository.Table.Where(cr => cr.Id == request.Id)
+									.Include(cr => cr.Ad)
+										.ThenInclude(ad => ad.Images)
+									.Include(cr => cr.Seller)
+									.Include(cr => cr.Buyer)
+									.Include(cr => cr.Messages)
+									.FirstOrDefaultAsync(cancellationToken: cancellationToken)
 						   ?? throw new KeyNotFoundException("Chat room not found.");
 
 			if (chatRoom.BuyerId != _currentUserService.UserId && chatRoom.SellerId != _currentUserService.UserId)
@@ -39,10 +45,12 @@ public class GetChatRoomQueryHandler : IRequestHandler<GetChatRoomQuery, Result<
 																				  && m.AdId == chatRoom.AdId,
 																				  cancellationToken: cancellationToken);
 
-			var lastMessage = _сhatMessageReadRepository
-					.GetWhere(m => m.AdId == chatRoom.AdId &&
+			var lastMessage = _сhatMessageReadRepository.GetWhere(m => m.AdId == chatRoom.AdId &&
 						(m.SenderId == chatRoom.BuyerId || m.SenderId == chatRoom.SellerId) &&
 						(m.ReceiverId == chatRoom.BuyerId || m.ReceiverId == chatRoom.SellerId))
+					//.Include(m => m.Ad)
+					//.Include(m => m.Sender)
+					//.Include(m => m.Receiver)
 					.ToList();
 
 			var lastMessageAt = lastMessage.Count != 0 ? lastMessage.Max(m => m.CreatedAt) : chatRoom.CreatedAt;

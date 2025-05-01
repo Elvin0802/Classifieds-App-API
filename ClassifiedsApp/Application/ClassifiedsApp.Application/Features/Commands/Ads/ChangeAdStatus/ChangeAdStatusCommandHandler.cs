@@ -31,6 +31,9 @@ public class ChangeAdStatusCommandHandler : IRequestHandler<ChangeAdStatusComman
 			if (ad.Status == AdStatus.Active)
 				ad.ExpiresAt = ad.UpdatedAt.AddDays(7);
 
+			_adWriteRepository.Update(ad);
+			await _adWriteRepository.SaveAsync();
+
 			return Result.Success("Ad Status Changed.");
 		}
 		catch (Exception ex)

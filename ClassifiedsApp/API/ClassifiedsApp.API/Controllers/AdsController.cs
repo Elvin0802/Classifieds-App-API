@@ -69,7 +69,7 @@ public class AdsController : ControllerBase
 
 	[HttpPost("[action]")]
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin,User")]
-	public async Task<ActionResult<Result>> Update([FromBody] UpdateAdCommand command)
+	public async Task<ActionResult<Result>> Update([FromForm] UpdateAdCommand command)
 	{
 		return Ok(await _mediator.Send(command));
 	}

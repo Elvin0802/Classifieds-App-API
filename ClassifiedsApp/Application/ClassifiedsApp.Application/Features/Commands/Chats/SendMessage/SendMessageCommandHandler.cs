@@ -65,7 +65,9 @@ public class SendMessageCommandHandler : IRequestHandler<SendMessageCommand, Res
 				SenderId = message.SenderId,
 				SenderName = sender.Name,
 				CreatedAt = message.CreatedAt,
-				IsRead = message.IsRead
+				IsRead = message.IsRead,
+				ReceiverId = message.ReceiverId,
+				ChatRoomId = message.ChatRoomId
 			};
 
 			await _chatHub.SendMessageAsync(receiverId.ToString(), SignalRMethodNames.ReceiveMessageName, messageDto);

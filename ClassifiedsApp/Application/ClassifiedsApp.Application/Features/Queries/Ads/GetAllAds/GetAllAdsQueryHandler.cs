@@ -63,7 +63,14 @@ public class GetAllAdsQueryHandler : IRequestHandler<GetAllAdsQuery, Result<GetA
 			var searchTerm = request.SearchTitle?.Trim().ToLower();
 
 			if (!string.IsNullOrWhiteSpace(searchTerm))
-				query = query.Where(ad => ad.Title.ToLower().Contains(searchTerm));
+			{
+				var newQuery = query.Where(ad => ad.Title.ToLower().Contains(searchTerm));
+
+				if (newQuery.Count() < 1)
+					query = query.Where(ad => ad.Description.ToLower().Contains(searchTerm));
+				else
+					query = newQuery;
+			}
 
 			// Apply price filters
 			if (request.MinPrice.HasValue)

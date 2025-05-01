@@ -41,6 +41,6 @@ public class CreateAdCommand : IRequest<Result>
 			? new List<CreateAdSubCategoryValueDto>()
 			: JsonSerializer.Deserialize<IList<CreateAdSubCategoryValueDto>>(SubCategoryValuesJson)!;
 
-	public IList<IFormFile> Images { get; set; }
+	public IList<IFormFile>? Images { get; set; }
 }
 

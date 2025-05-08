@@ -16,7 +16,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ClassifiedsApp.API.Controllers;
 
-[Route("api/[controller]")]
+[Route("api/[controller]/[action]")]
 [ApiController]
 public class AdsController : ControllerBase
 {
@@ -27,68 +27,68 @@ public class AdsController : ControllerBase
 		_mediator = mediator;
 	}
 
-	[HttpPost("[action]")]
+	[HttpPost]
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin,User")]
 	public async Task<ActionResult<Result>> Create([FromForm] CreateAdCommand command)
 	{
 		return Ok(await _mediator.Send(command));
 	}
 
-	[HttpPost("[action]")]
+	[HttpPost]
 	public async Task<ActionResult<Result<GetAllAdsQueryResponse>>> GetAll([FromBody] GetAllAdsQuery? query)
 	{
 		return Ok(await _mediator.Send(query!));
 	}
 
-	[HttpGet("[action]")]
+	[HttpGet]
 	public async Task<ActionResult<Result<GetAdByIdQueryResponse>>> GetById([FromQuery] GetAdByIdQuery query)
 	{
 		return Ok(await _mediator.Send(query));
 	}
 
-	[HttpGet("[action]")]
+	[HttpGet]
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin,User")]
 	public async Task<ActionResult<Result>> Delete([FromQuery] DeleteAdCommand command)
 	{
 		return Ok(await _mediator.Send(command));
 	}
 
-	[HttpPost("[action]")]
+	[HttpPost]
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin,User")]
 	public async Task<ActionResult<Result>> SelectAd([FromBody] SelectAdCommand command)
 	{
 		return Ok(await _mediator.Send(command));
 	}
 
-	[HttpPost("[action]")]
+	[HttpPost]
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin,User")]
 	public async Task<ActionResult<Result>> UnselectAd([FromBody] UnselectAdCommand command)
 	{
 		return Ok(await _mediator.Send(command));
 	}
 
-	[HttpPost("[action]")]
+	[HttpPost]
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin,User")]
 	public async Task<ActionResult<Result>> Update([FromForm] UpdateAdCommand command)
 	{
 		return Ok(await _mediator.Send(command));
 	}
 
-	[HttpGet("[action]")]
+	[HttpGet]
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin,User")]
 	public async Task<ActionResult<Result<GetFeaturedPricingQueryResponse>>> GetPricingOptions()
 	{
 		return Ok(await _mediator.Send(new GetFeaturedPricingQuery()));
 	}
 
-	[HttpPost("[action]")]
+	[HttpPost]
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin,User")]
 	public async Task<ActionResult<Result>> FeatureAd(FeatureAdCommand command)
 	{
 		return Ok(await _mediator.Send(command));
 	}
 
-	[HttpPost("[action]")]
+	[HttpPost]
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
 	public async Task<ActionResult<Result>> ChangeAdStatus([FromBody] ChangeAdStatusCommand command)
 	{

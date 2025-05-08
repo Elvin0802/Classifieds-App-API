@@ -14,7 +14,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ClassifiedsApp.API.Controllers;
 
-[Route("api/[controller]")]
+[Route("api/[controller]/[action]")]
 [ApiController]
 [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin,User")]
 public class ChatController : ControllerBase
@@ -26,43 +26,43 @@ public class ChatController : ControllerBase
 		_mediator = mediator;
 	}
 
-	[HttpPost("[action]")]
+	[HttpPost]
 	public async Task<ActionResult<Result<ChatRoomDto>>> CreateChatRoom(CreateChatRoomCommand command)
 	{
 		return Ok(await _mediator.Send(command));
 	}
 
-	[HttpPost("[action]")]
+	[HttpPost]
 	public async Task<ActionResult<Result<GetChatRoomsByUserQueryResponse>>> GetChatRooms()
 	{
 		return Ok(await _mediator.Send(new GetChatRoomsByUserQuery()));
 	}
 
-	[HttpPost("[action]")]
+	[HttpPost]
 	public async Task<ActionResult<Result<GetChatRoomQueryResponse>>> GetChatRoom([FromBody] GetChatRoomQuery query)
 	{
 		return Ok(await _mediator.Send(query));
 	}
 
-	[HttpPost("[action]")]
+	[HttpPost]
 	public async Task<ActionResult<Result<GetChatMessagesByChatRoomQueryResponse>>> GetChatMessages([FromBody] GetChatMessagesByChatRoomQuery query)
 	{
 		return Ok(await _mediator.Send(query));
 	}
 
-	[HttpPost("[action]")]
+	[HttpPost]
 	public async Task<ActionResult<Result<GetAdChatInfoQueryResponse>>> GetAdChatInfo([FromBody] GetAdChatInfoQuery query)
 	{
 		return Ok(await _mediator.Send(query));
 	}
 
-	[HttpPost("[action]")]
+	[HttpPost]
 	public async Task<ActionResult<Result<ChatMessageDto>>> SendMessage([FromBody] SendMessageCommand command)
 	{
 		return Ok(await _mediator.Send(command));
 	}
 
-	[HttpPost("[action]")]
+	[HttpPost]
 	public async Task<ActionResult<Result>> MarkMessagesAsRead([FromBody] MarkMessagesAsReadCommand command)
 	{
 		return Ok(await _mediator.Send(command));

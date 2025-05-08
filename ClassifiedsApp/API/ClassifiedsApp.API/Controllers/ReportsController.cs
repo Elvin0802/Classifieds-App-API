@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ClassifiedsApp.API.Controllers;
 
-[Route("api/[controller]")]
+[Route("api/[controller]/[action]")]
 [ApiController]
 public class ReportsController : ControllerBase
 {
@@ -23,35 +23,35 @@ public class ReportsController : ControllerBase
 		_mediator = mediator;
 	}
 
-	[HttpPost("[action]")]
+	[HttpPost]
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin,User")]
 	public async Task<ActionResult<Result>> CreateReport([FromBody] CreateReportCommand command)
 	{
 		return Ok(await _mediator.Send(command));
 	}
 
-	[HttpGet("[action]")]
+	[HttpGet]
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
 	public async Task<ActionResult<Result<GetAllReportsQueryResponse>>> GetAllReports([FromQuery] ReportStatus? status = null)
 	{
 		return Ok(await _mediator.Send(new GetAllReportsQuery { Status = status }));
 	}
 
-	[HttpGet("[action]/{id}")]
+	[HttpGet("{id}")]
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
 	public async Task<ActionResult<Result<GetReportByIdQueryResponse>>> GetReportById(Guid id)
 	{
 		return Ok(await _mediator.Send(new GetReportByIdQuery { Id = id }));
 	}
 
-	[HttpGet("[action]/{adId}")]
+	[HttpGet("{adId}")]
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
 	public async Task<ActionResult<Result<GetReportsByAdIdQueryResponse>>> GetReportsByAdId(Guid adId)
 	{
 		return Ok(await _mediator.Send(new GetReportsByAdIdQuery { Id = adId }));
 	}
 
-	[HttpPost("[action]")]
+	[HttpPost]
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
 	public async Task<ActionResult<Result>> UpdateReportStatus(UpdateReportStatusCommand command)
 	{

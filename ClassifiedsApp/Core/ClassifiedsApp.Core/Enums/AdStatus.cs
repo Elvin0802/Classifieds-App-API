@@ -6,5 +6,5 @@ public enum AdStatus
 	Active,
 	Expired,
 	Rejected,
-	Archived,
+	Archived
 }

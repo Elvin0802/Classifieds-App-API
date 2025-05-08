@@ -41,6 +41,7 @@ public class UpdateAdCommandHandler : IRequestHandler<UpdateAdCommand, Result>
 			ad.IsNew = request.IsNew;
 			ad.UpdatedAt = DateTimeOffset.UtcNow;
 
+			/*
 			// 1. Silinecek resimleri işle
 			if (request.ImagesToDelete != null && request.ImagesToDelete.Any())
 			{
@@ -98,6 +99,7 @@ public class UpdateAdCommandHandler : IRequestHandler<UpdateAdCommand, Result>
 					}
 				}
 			}
+			*/
 
 			// İlanı güncelle
 			_writeRepository.Update(ad);
@@ -110,37 +112,5 @@ public class UpdateAdCommandHandler : IRequestHandler<UpdateAdCommand, Result>
 			return Result.Failure($"Error occurred: {ex.Message}");
 		}
 	}
-
-
-	/*
-	
-	public async Task<Result> Handle(UpdateAdCommand request, CancellationToken cancellationToken)
-	{
-		try
-		{
-			Ad ad = await _readRepository.GetByIdAsync(request.Id);
-
-			if (ad is null)
-				throw new KeyNotFoundException("Ad Not Found.");
-
-			ad.Description = request.Description;
-			ad.Price = request.Price;
-			ad.IsNew = request.IsNew;
-
-			ad.UpdatedAt = DateTimeOffset.UtcNow;
-
-			_writeRepository.Update(ad);
-
-			await _writeRepository.SaveAsync();
-
-			return Result.Success("Ad updated successfully.");
-		}
-		catch (Exception ex)
-		{
-			return Result.Failure($"Error occoured. {ex.Message}");
-		}
-	}
-
-	*/
 
 }

@@ -40,7 +40,7 @@ public class UserService : IUserService
 		var user = new AppUser
 		{
 			Email = dto.Email,
-			UserName = dto.Email, // * gelecekde Phone number et ki , username login mumkun olsun. | elemeyede bilerem.
+			UserName = dto.Email,
 			Name = dto.Name,
 			PhoneNumber = dto.PhoneNumber,
 			CreatedAt = DateTimeOffset.UtcNow,

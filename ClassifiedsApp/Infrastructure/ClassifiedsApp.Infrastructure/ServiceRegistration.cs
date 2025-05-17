@@ -1,4 +1,5 @@
 ﻿using Azure.Storage.Blobs;
+using ClassifiedsApp.Application.Dtos.RateLimit;
 using ClassifiedsApp.Application.Interfaces.Repositories.AdImages;
 using ClassifiedsApp.Application.Interfaces.Repositories.Ads;
 using ClassifiedsApp.Application.Interfaces.Repositories.Categories;
@@ -9,6 +10,7 @@ using ClassifiedsApp.Application.Interfaces.Repositories.Users;
 using ClassifiedsApp.Application.Interfaces.Services.Ads;
 using ClassifiedsApp.Application.Interfaces.Services.Auth;
 using ClassifiedsApp.Application.Interfaces.Services.Mail;
+using ClassifiedsApp.Application.Interfaces.Services.RateLimit;
 using ClassifiedsApp.Application.Interfaces.Services.Users;
 using ClassifiedsApp.Core.Entities;
 using ClassifiedsApp.Infrastructure.Persistence.Context;
@@ -23,8 +25,10 @@ using ClassifiedsApp.Infrastructure.Services.Ads;
 using ClassifiedsApp.Infrastructure.Services.Auth;
 using ClassifiedsApp.Infrastructure.Services.BackgroundJobs;
 using ClassifiedsApp.Infrastructure.Services.Mail;
+using ClassifiedsApp.Infrastructure.Services.RateLimit;
 using ClassifiedsApp.Infrastructure.Services.Users;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -54,6 +58,8 @@ public static class ServiceRegistration
 		.AddDefaultTokenProviders();
 
 		services.AddSingleton(x => new BlobServiceClient(configuration.GetConnectionString("AzureBlobStorage")));
+
+		services.Configure<RateLimitOptionsDto>(configuration.GetSection("RateLimit"));
 
 
 		// caching usage
@@ -142,6 +148,12 @@ public static class ServiceRegistration
 
 		services.AddScoped<IAdImageService, AdImageService>();
 
-		services.AddScoped<TestJobService>(); // add job service.
+		services.AddSingleton<IRateLimitService, RateLimitService>(); // rate limit.
+
+		services.AddScoped<TestJobService>(); // add test job service.
+		services.AddScoped<RateLimitResetJobService>(); // add rate limit job service.
+
+
 	}
+
 }

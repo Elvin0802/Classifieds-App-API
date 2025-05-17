@@ -13,6 +13,7 @@ using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace ClassifiedsApp.API.Controllers;
 
@@ -35,12 +36,14 @@ public class AdsController : ControllerBase
 	}
 
 	[HttpPost]
+	[DisableRateLimiting]
 	public async Task<ActionResult<Result<GetAllAdsQueryResponse>>> GetAll([FromBody] GetAllAdsQuery? query)
 	{
 		return Ok(await _mediator.Send(query!));
 	}
 
 	[HttpGet]
+	[DisableRateLimiting]
 	public async Task<ActionResult<Result<GetAdByIdQueryResponse>>> GetById([FromQuery] GetAdByIdQuery query)
 	{
 		return Ok(await _mediator.Send(query));

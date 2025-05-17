@@ -12,6 +12,7 @@ using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace ClassifiedsApp.API.Controllers;
 
@@ -36,12 +37,14 @@ public class CategoriesController : ControllerBase
 	}
 
 	[HttpGet("all/category")]
+	[DisableRateLimiting]
 	public async Task<ActionResult<Result<GetAllCategoriesQueryResponse>>> GetAll([FromQuery] GetAllCategoriesQuery query)
 	{
 		return Ok(await _mediator.Send(query));
 	}
 
 	[HttpGet("byId/category")]
+	[DisableRateLimiting]
 	public async Task<ActionResult<Result<GetCategoryByIdQueryResponse>>> GetById([FromQuery] GetCategoryByIdQuery query)
 	{
 		return Ok(await _mediator.Send(query));
@@ -59,12 +62,14 @@ public class CategoriesController : ControllerBase
 	}
 
 	[HttpGet("all/main-category")]
+	[DisableRateLimiting]
 	public async Task<ActionResult<Result<GetAllMainCategoriesQueryResponse>>> GetAll([FromQuery] GetAllMainCategoriesQuery query)
 	{
 		return Ok(await _mediator.Send(query));
 	}
 
 	[HttpGet("byId/main-category")]
+	[DisableRateLimiting]
 	public async Task<ActionResult<Result<GetMainCategoryByIdQueryResponse>>> GetById([FromQuery] GetMainCategoryByIdQuery query)
 	{
 		return Ok(await _mediator.Send(query));
@@ -82,12 +87,14 @@ public class CategoriesController : ControllerBase
 	}
 
 	[HttpGet("all/sub-category")]
+	[DisableRateLimiting]
 	public async Task<ActionResult<Result<GetAllSubCategoriesQueryResponse>>> GetAll([FromQuery] GetAllSubCategoriesQuery query)
 	{
 		return Ok(await _mediator.Send(query));
 	}
 
 	[HttpGet("byId/sub-category")]
+	[DisableRateLimiting]
 	public async Task<ActionResult<Result<GetSubCategoryByIdQueryResponse>>> GetById([FromQuery] GetSubCategoryByIdQuery query)
 	{
 		return Ok(await _mediator.Send(query));

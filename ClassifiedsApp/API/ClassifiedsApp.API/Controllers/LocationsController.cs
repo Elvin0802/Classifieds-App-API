@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ClassifiedsApp.API.Controllers;
 
-[Route("api/[controller]")]
+[Route("api/[controller]/[action]")]
 [ApiController]
 
 public class LocationsController : ControllerBase
@@ -22,26 +22,26 @@ public class LocationsController : ControllerBase
 		_mediator = mediator;
 	}
 
-	[HttpPost("[action]")]
+	[HttpPost]
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
 	public async Task<ActionResult<Result>> Create([FromBody] CreateLocationCommand command)
 	{
 		return Ok(await _mediator.Send(command));
 	}
 
-	[HttpGet("[action]")]
+	[HttpGet]
 	public async Task<ActionResult<Result<GetAllLocationsQueryResponse>>> GetAll([FromQuery] GetAllLocationsQuery query)
 	{
 		return Ok(await _mediator.Send(query));
 	}
 
-	[HttpGet("[action]")]
+	[HttpGet]
 	public async Task<ActionResult<Result<GetLocationByIdQueryResponse>>> GetById([FromQuery] GetLocationByIdQuery query)
 	{
 		return Ok(await _mediator.Send(query));
 	}
 
-	[HttpPost("[action]")]
+	[HttpPost]
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
 	public async Task<ActionResult<Result>> Delete([FromBody] DeleteLocationCommand command)
 	{

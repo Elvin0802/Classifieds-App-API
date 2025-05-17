@@ -3,6 +3,7 @@ using ClassifiedsApp.Application.Common.Consts;
 using ClassifiedsApp.Application.Common.Results;
 using ClassifiedsApp.Application.Interfaces.Repositories.Ads;
 using ClassifiedsApp.Application.Interfaces.Services.Ads;
+using ClassifiedsApp.Core.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -41,13 +42,25 @@ public class DeleteAdCommandHandler : IRequestHandler<DeleteAdCommand, Result>
 			var ad = await adQuery.FirstOrDefaultAsync(cancellationToken: cancellationToken)
 					 ?? throw new KeyNotFoundException($"Ad not found.");
 
-			foreach (var image in ad.Images)
-			{
-				if (!string.IsNullOrEmpty(image.BlobName))
-					await _adImageService.DeleteAsync(image.BlobName, AzureContainerNames.ContainerName);
-			}
+			// delete images from azure container
+			//foreach (var image in ad.Images)
+			//{
+			//	if (!string.IsNullOrEmpty(image.BlobName))
+			//		await _adImageService.DeleteAsync(image.BlobName, AzureContainerNames.ContainerName);
+			//}
 
+			// hard delete
+			/*
 			if (!await _adWriteRepository.RemoveAsync(ad.Id))
+				throw new RequestFailedException($"Ad not deleted.");
+				*/
+
+
+			// soft delete
+			ad.Status = AdStatus.Archived;
+			ad.ArchivedAt = DateTime.UtcNow;
+
+			if (!_adWriteRepository.Update(ad))
 				throw new RequestFailedException($"Ad not deleted.");
 
 			await _adWriteRepository.SaveAsync();

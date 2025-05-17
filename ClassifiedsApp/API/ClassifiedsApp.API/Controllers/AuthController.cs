@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ClassifiedsApp.API.Controllers;
 
-[Route("api/[controller]")]
+[Route("api/[controller]/[action]")]
 [ApiController]
 public class AuthController : ControllerBase
 {
@@ -22,50 +22,33 @@ public class AuthController : ControllerBase
 		_mediator = mediator;
 	}
 
-	[HttpPost("[action]")]
+	[HttpPost]
 	public async Task<ActionResult<Result<string>>> Login(LoginCommand command)
 	{
+		command.Response = Response;
+
 		AuthTokenDto authToken = (await _mediator.Send(command)).Data;
-
-		Response.Headers.Append("Authorization", $"Bearer {authToken.AccessToken}");
-
-		Response.Cookies.Append("refreshToken", authToken.RefreshToken!, new CookieOptions
-		{
-			HttpOnly = true,
-			Secure = false,
-			SameSite = SameSiteMode.Lax,
-			Expires = authToken.RefreshTokenExpiresAt,
-		});
 
 		return Ok(Result.Success(authToken.AccessToken, "Login successfully completed."));
 		//return Ok(new { token = authToken.AccessToken });
 		//return Ok(); // use this line for production.
 	}
 
-	[HttpPost("[action]")]
+	[HttpPost]
 	public async Task<ActionResult<Result<string>>> RefreshTokenLogin()
 	{
-		var refreshToken = Request.Cookies["refreshToken"];
-		if (string.IsNullOrEmpty(refreshToken))
-			return Unauthorized(new { Error = "Refresh token not found." });
-
-		AuthTokenDto authToken = (await _mediator.Send(new RefreshTokenLoginCommand { RefreshToken = refreshToken })).Data;
-
-		Response.Headers.Append("Authorization", $"Bearer {authToken.AccessToken}");
-
-		Response.Cookies.Append("refreshToken", authToken.RefreshToken!, new CookieOptions
-		{
-			HttpOnly = true,
-			Secure = false,
-			SameSite = SameSiteMode.Lax,
-			Expires = authToken.RefreshTokenExpiresAt,
-		});
+		AuthTokenDto authToken = (await _mediator.Send(
+			new RefreshTokenLoginCommand
+			{
+				Request = Request,
+				Response = Response
+			})).Data;
 
 		return Ok(Result.Success(authToken.AccessToken, "Refresh Token Login successfully completed."));
 		//return Ok(new { token = authToken.AccessToken });
 	}
 
-	[HttpPost("[action]")]
+	[HttpPost]
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin,User")]
 	public async Task<ActionResult<Result>> Logout()
 	{
@@ -82,13 +65,13 @@ public class AuthController : ControllerBase
 		//return Ok(new { Message = "Log out success." });
 	}
 
-	[HttpPost("reset-password")]
+	[HttpPost]
 	public async Task<ActionResult<Result>> PasswordReset([FromBody] PasswordResetCommand command)
 	{
 		return Ok(await _mediator.Send(command));
 	}
 
-	[HttpPost("confirm-reset-token")]
+	[HttpPost]
 	public async Task<ActionResult<Result>> ConfirmResetToken([FromBody] ConfirmResetTokenCommand command)
 	{
 		return Ok(await _mediator.Send(command));

@@ -8,6 +8,7 @@ using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace ClassifiedsApp.API.Controllers;
 
@@ -23,10 +24,9 @@ public class AuthController : ControllerBase
 	}
 
 	[HttpPost]
+	[DisableRateLimiting]
 	public async Task<ActionResult<Result<string>>> Login(LoginCommand command)
 	{
-		command.Response = Response;
-
 		AuthTokenDto authToken = (await _mediator.Send(command)).Data;
 
 		return Ok(Result.Success(authToken.AccessToken, "Login successfully completed."));
@@ -35,14 +35,10 @@ public class AuthController : ControllerBase
 	}
 
 	[HttpPost]
+	[DisableRateLimiting]
 	public async Task<ActionResult<Result<string>>> RefreshTokenLogin()
 	{
-		AuthTokenDto authToken = (await _mediator.Send(
-			new RefreshTokenLoginCommand
-			{
-				Request = Request,
-				Response = Response
-			})).Data;
+		AuthTokenDto authToken = (await _mediator.Send(new RefreshTokenLoginCommand())).Data;
 
 		return Ok(Result.Success(authToken.AccessToken, "Refresh Token Login successfully completed."));
 		//return Ok(new { token = authToken.AccessToken });
@@ -66,12 +62,14 @@ public class AuthController : ControllerBase
 	}
 
 	[HttpPost]
+	[DisableRateLimiting]
 	public async Task<ActionResult<Result>> PasswordReset([FromBody] PasswordResetCommand command)
 	{
 		return Ok(await _mediator.Send(command));
 	}
 
 	[HttpPost]
+	[DisableRateLimiting]
 	public async Task<ActionResult<Result>> ConfirmResetToken([FromBody] ConfirmResetTokenCommand command)
 	{
 		return Ok(await _mediator.Send(command));

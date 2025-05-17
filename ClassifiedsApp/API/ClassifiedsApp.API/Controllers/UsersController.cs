@@ -6,6 +6,7 @@ using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace ClassifiedsApp.API.Controllers;
 
@@ -21,12 +22,20 @@ public class UsersController : ControllerBase
 	}
 
 	[HttpPost]
+	[DisableRateLimiting]
 	public async Task<ActionResult<Result>> Register(RegisterCommand command)
 	{
 		return Ok(await _mediator.Send(command));
 	}
 
+	//[HttpPost]
+	//public async Task<ActionResult<Result>> CheckEmail(RegisterCommand command)
+	//{
+	//	return Ok(await _mediator.Send(command));
+	//}
+
 	[HttpPost]
+	[DisableRateLimiting]
 	public async Task<ActionResult<Result>> UpdatePassword([FromBody] UpdatePasswordCommand command)
 	{
 		return Ok(await _mediator.Send(command));

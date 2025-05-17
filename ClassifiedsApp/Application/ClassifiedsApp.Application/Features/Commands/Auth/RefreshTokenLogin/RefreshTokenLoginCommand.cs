@@ -7,6 +7,5 @@ namespace ClassifiedsApp.Application.Features.Commands.Auth.RefreshTokenLogin;
 
 public class RefreshTokenLoginCommand : IRequest<Result<AuthTokenDto>>
 {
-	public HttpRequest Request { get; set; }
-	public HttpResponse Response { get; set; }
+
 }

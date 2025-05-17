@@ -10,17 +10,19 @@ namespace ClassifiedsApp.Application.Features.Commands.Auth.RefreshTokenLogin;
 public class RefreshTokenLoginCommandHandler : IRequestHandler<RefreshTokenLoginCommand, Result<AuthTokenDto>>
 {
 	readonly IAuthService _authService;
+	readonly IHttpContextAccessor _contextAccessor;
 
-	public RefreshTokenLoginCommandHandler(IAuthService authService)
+	public RefreshTokenLoginCommandHandler(IAuthService authService, IHttpContextAccessor contextAccessor)
 	{
 		_authService = authService;
+		_contextAccessor = contextAccessor;
 	}
 
 	public async Task<Result<AuthTokenDto>> Handle(RefreshTokenLoginCommand request, CancellationToken cancellationToken)
 	{
 		try
 		{
-			var refreshToken = request.Request.Cookies["refreshToken"];
+			var refreshToken = _contextAccessor.HttpContext?.Request.Cookies["refreshToken"];
 
 			if (string.IsNullOrEmpty(refreshToken))
 				throw new UnauthorizedAccessException("Refresh token not found.");
@@ -28,9 +30,9 @@ public class RefreshTokenLoginCommandHandler : IRequestHandler<RefreshTokenLogin
 			var tokenDto = await _authService.RefreshTokenLoginAsync(refreshToken)
 							?? throw new AuthenticationFailedException("Token not created , refresh token login failed.");
 
-			request.Response.Headers.Append("Authorization", $"Bearer {tokenDto.AccessToken}");
+			_contextAccessor.HttpContext?.Response.Headers.Append("Authorization", $"Bearer {tokenDto.AccessToken}");
 
-			request.Response.Cookies.Append("refreshToken", tokenDto.RefreshToken!, new CookieOptions
+			_contextAccessor.HttpContext?.Response.Cookies.Append("refreshToken", tokenDto.RefreshToken!, new CookieOptions
 			{
 				HttpOnly = true,
 				Secure = false,

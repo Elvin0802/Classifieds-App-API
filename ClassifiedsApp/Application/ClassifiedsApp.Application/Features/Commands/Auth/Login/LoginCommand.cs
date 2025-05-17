@@ -9,5 +9,4 @@ public class LoginCommand : IRequest<Result<AuthTokenDto>>
 {
 	public string Email { get; set; }
 	public string Password { get; set; }
-	public HttpResponse Response { get; set; }
 }

@@ -162,10 +162,12 @@ public static class DIConfig
 		return services;
 	}
 
-	public static IServiceCollection AddBackgroundJobs(this IServiceCollection services)
+	public static IServiceCollection AddBackgroundJobs(this IServiceCollection services, IConfiguration configuration)
 	{
 		services.AddQuartz(q =>
 		{
+			#region Test Job
+
 			// Configure Hourly Job (every 1 hour)
 
 			var hourlyJobKey = new JobKey("HourlyJob");
@@ -178,6 +180,26 @@ public static class DIConfig
 				.WithSimpleSchedule(schedule => schedule
 					.WithIntervalInHours(1)
 					.RepeatForever()));
+
+			#endregion
+
+			#region Rate Limit Reset Job
+
+			var rateLimitResetJobKey = new JobKey("RateLimitResetJob");
+
+			q.AddJob<RateLimitResetJob>(opts => opts.WithIdentity(rateLimitResetJobKey));
+
+			var windowSeconds = int.Parse(configuration["RateLimit:WindowSeconds"] ?? "120");
+
+			q.AddTrigger(opts => opts
+				.ForJob(rateLimitResetJobKey)
+				.WithIdentity("RateLimitResetJob-trigger")
+				.WithSimpleSchedule(x => x
+					.WithIntervalInSeconds(windowSeconds)
+					.RepeatForever()));
+
+			#endregion
+
 
 			// Configure Weekly Job (Monday at 12:00)
 			/*
@@ -212,5 +234,7 @@ public static class DIConfig
 		});
 
 		return services;
+
 	}
+
 }

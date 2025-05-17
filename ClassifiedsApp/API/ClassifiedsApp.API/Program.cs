@@ -30,7 +30,7 @@ builder.Services.AddSignalRServices();
 
 builder.Services.AddSwagger();
 
-builder.Services.AddBackgroundJobs();
+builder.Services.AddBackgroundJobs(builder.Configuration);
 
 var client = builder.Configuration["ClientUrl"];
 
@@ -60,6 +60,8 @@ app.UseCors("CORSPolicy");
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseMiddleware<RateLimitingMiddleware>();
 
 app.MapControllers();
 

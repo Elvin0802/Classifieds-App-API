@@ -7,6 +7,7 @@ using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace ClassifiedsApp.API.Controllers;
 
@@ -30,12 +31,14 @@ public class LocationsController : ControllerBase
 	}
 
 	[HttpGet]
+	[DisableRateLimiting]
 	public async Task<ActionResult<Result<GetAllLocationsQueryResponse>>> GetAll([FromQuery] GetAllLocationsQuery query)
 	{
 		return Ok(await _mediator.Send(query));
 	}
 
 	[HttpGet]
+	[DisableRateLimiting]
 	public async Task<ActionResult<Result<GetLocationByIdQueryResponse>>> GetById([FromQuery] GetLocationByIdQuery query)
 	{
 		return Ok(await _mediator.Send(query));

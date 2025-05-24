@@ -1,5 +1,6 @@
 ﻿using Azure.Storage.Blobs;
 using ClassifiedsApp.Application.Dtos.Cache;
+using ClassifiedsApp.Application.Dtos.Encryption;
 using ClassifiedsApp.Application.Dtos.RateLimit;
 using ClassifiedsApp.Application.Interfaces.Repositories.AdImages;
 using ClassifiedsApp.Application.Interfaces.Repositories.Ads;
@@ -11,6 +12,7 @@ using ClassifiedsApp.Application.Interfaces.Repositories.Users;
 using ClassifiedsApp.Application.Interfaces.Services.Ads;
 using ClassifiedsApp.Application.Interfaces.Services.Auth;
 using ClassifiedsApp.Application.Interfaces.Services.Cache;
+using ClassifiedsApp.Application.Interfaces.Services.Common;
 using ClassifiedsApp.Application.Interfaces.Services.Mail;
 using ClassifiedsApp.Application.Interfaces.Services.RateLimit;
 using ClassifiedsApp.Application.Interfaces.Services.Users;
@@ -27,6 +29,7 @@ using ClassifiedsApp.Infrastructure.Services.Ads;
 using ClassifiedsApp.Infrastructure.Services.Auth;
 using ClassifiedsApp.Infrastructure.Services.BackgroundJobs;
 using ClassifiedsApp.Infrastructure.Services.Cache;
+using ClassifiedsApp.Infrastructure.Services.Encryption;
 using ClassifiedsApp.Infrastructure.Services.Mail;
 using ClassifiedsApp.Infrastructure.Services.RateLimit;
 using ClassifiedsApp.Infrastructure.Services.Users;
@@ -91,6 +94,9 @@ public static class ServiceRegistration
 		}
 
 		services.AddScoped<ICacheService, RedisCacheService>();
+
+		services.Configure<EncryptionSettingsDto>(configuration.GetSection("Encryption"));
+		services.AddScoped<IEncryptionService, EncryptionService>();
 
 		services.AddScoped<IAdReadRepository, AdReadRepository>();
 		services.AddScoped<IAdWriteRepository, AdWriteRepository>();

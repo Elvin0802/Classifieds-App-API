@@ -126,6 +126,7 @@ public class GetAllAdsQueryHandler : IRequestHandler<GetAllAdsQuery, Result<GetA
 					IsFeatured = p.IsFeatured,
 					MainImageUrl = p.Images.FirstOrDefault(img => img.SortOrder == 0)!.Url,
 					IsSelected = request.CurrentAppUserId.HasValue && p.SelectorUsers.Any(su => su.AppUserId == request.CurrentAppUserId.Value),
+					IsOwner = p.AppUserId == request.CurrentAppUserId,
 					CreatedAt = p.CreatedAt,
 					UpdatedAt = p.UpdatedAt,
 					Status = p.Status,

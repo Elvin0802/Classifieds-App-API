@@ -11,6 +11,7 @@ public class AdPreviewDto
 	public DateTimeOffset ExpiresAt { get; set; }
 	public decimal Price { get; set; }
 	public bool IsNew { get; set; }
+	public bool IsOwner { get; set; }
 	public bool IsSelected { get; set; }
 	public bool IsFeatured { get; set; }
 	public string LocationCityName { get; set; }

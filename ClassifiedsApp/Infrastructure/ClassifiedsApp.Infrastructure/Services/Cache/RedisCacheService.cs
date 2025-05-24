@@ -46,8 +46,6 @@ namespace ClassifiedsApp.Infrastructure.Services.Cache
 
 		public async Task<T> GetAsync<T>(string key)
 		{
-			key = BuildUserSpecificKey(key);
-
 			try
 			{
 				var cachedBytes = await _distributedCache.GetAsync(key);
@@ -66,8 +64,6 @@ namespace ClassifiedsApp.Infrastructure.Services.Cache
 
 		public async Task SetAsync<T>(string key, T value, TimeSpan? expiration = null)
 		{
-			key = BuildUserSpecificKey(key);
-
 			try
 			{
 				var options = new DistributedCacheEntryOptions
@@ -87,8 +83,6 @@ namespace ClassifiedsApp.Infrastructure.Services.Cache
 
 		public async Task RemoveAsync(string key)
 		{
-			key = BuildUserSpecificKey(key);
-
 			try
 			{
 				await _distributedCache.RemoveAsync(key);
@@ -102,8 +96,6 @@ namespace ClassifiedsApp.Infrastructure.Services.Cache
 
 		public async Task RemoveByPrefixAsync(string prefix)
 		{
-			// helelik remove da user id ya ehtiyac yoxdu. sonra elave et.
-			//prefix = BuildUserSpecificKey(prefix);
 
 			try
 			{

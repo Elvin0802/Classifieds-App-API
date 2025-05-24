@@ -30,8 +30,6 @@ public class AuthController : ControllerBase
 		AuthTokenDto authToken = (await _mediator.Send(command)).Data;
 
 		return Ok(Result.Success(authToken.AccessToken, "Login successfully completed."));
-		//return Ok(new { token = authToken.AccessToken });
-		//return Ok(); // use this line for production.
 	}
 
 	[HttpPost]
@@ -41,7 +39,6 @@ public class AuthController : ControllerBase
 		AuthTokenDto authToken = (await _mediator.Send(new RefreshTokenLoginCommand())).Data;
 
 		return Ok(Result.Success(authToken.AccessToken, "Refresh Token Login successfully completed."));
-		//return Ok(new { token = authToken.AccessToken });
 	}
 
 	[HttpPost]
@@ -58,7 +55,6 @@ public class AuthController : ControllerBase
 		Response.Headers.Append("Authorization", "");
 
 		return Ok(Result.Success("Log Out successfully completed."));
-		//return Ok(new { Message = "Log out success." });
 	}
 
 	[HttpPost]

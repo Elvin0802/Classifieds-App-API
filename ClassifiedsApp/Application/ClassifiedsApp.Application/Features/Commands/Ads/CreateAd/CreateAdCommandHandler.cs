@@ -47,11 +47,6 @@ public class CreateAdCommandHandler : IRequestHandler<CreateAdCommand, Result>
 				Images = new List<AdImage>()
 			};
 
-			//newAd.Status = AdStatus.Pending; // veziyyeti gozleyen edirik ki , admin tesdiqlesin. // helelik deactive edilib.
-			//newAd.Status = Core.Enums.AdStatus.Active; // veziyyeti active edirik ki , tediqlenme olmadan , yoxlaya bilek.
-
-			//newAd.SubCategoryValues = new List<AdSubCategoryValue>();
-
 			foreach (var item in request.SubCategoryValues)
 			{
 				newAd.SubCategoryValues.Add(new()
@@ -62,27 +57,6 @@ public class CreateAdCommandHandler : IRequestHandler<CreateAdCommand, Result>
 				});
 			}
 
-			// Image service use !
-
-			int imageSortOrder = 0;
-
-			List<string> lstImages = [
-			"https://upload.wikimedia.org/wikipedia/commons/8/86/BMW_G60_520i_1X7A2443.jpg",
-			"https://www.bmw-m.com/content/dam/bmw/marketBMW_M/www_bmw-m_com/all-models/model-navigation/bmw-m340i-xdrive-sedan-flyout-new.png",
-			"https://mediapool.bmwgroup.com/cache/P9/202309/P90522951/P90522951-the-bmw-i5-edrive40-driving-10-2023-2247px.jpg"];
-
-			foreach (var i in lstImages)
-				newAd.Images.Add(new()
-				{
-					AdId = newAd.Id,
-					Url = i,
-					SortOrder = imageSortOrder++,
-					BlobName = i
-				});
-
-			//-----
-
-			/*
 			if (request.Images is null || request.Images.Count < 1)
 				throw new ArgumentNullException(nameof(request.Images), "Ad must have images.");
 
@@ -103,9 +77,6 @@ public class CreateAdCommandHandler : IRequestHandler<CreateAdCommand, Result>
 					});
 				}
 			}
-			*/
-
-			//-----
 
 			await _writeRepository.AddAsync(newAd);
 			await _adSubCategoryWriteRepository.AddRangeAsync(newAd.SubCategoryValues.ToList());

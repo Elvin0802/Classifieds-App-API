@@ -1,4 +1,5 @@
 ﻿using Azure.Storage.Blobs;
+using ClassifiedsApp.Application.Dtos.Cache;
 using ClassifiedsApp.Application.Dtos.RateLimit;
 using ClassifiedsApp.Application.Interfaces.Repositories.AdImages;
 using ClassifiedsApp.Application.Interfaces.Repositories.Ads;
@@ -9,6 +10,7 @@ using ClassifiedsApp.Application.Interfaces.Repositories.Reports;
 using ClassifiedsApp.Application.Interfaces.Repositories.Users;
 using ClassifiedsApp.Application.Interfaces.Services.Ads;
 using ClassifiedsApp.Application.Interfaces.Services.Auth;
+using ClassifiedsApp.Application.Interfaces.Services.Cache;
 using ClassifiedsApp.Application.Interfaces.Services.Mail;
 using ClassifiedsApp.Application.Interfaces.Services.RateLimit;
 using ClassifiedsApp.Application.Interfaces.Services.Users;
@@ -24,6 +26,7 @@ using ClassifiedsApp.Infrastructure.Persistence.Repositories.Users;
 using ClassifiedsApp.Infrastructure.Services.Ads;
 using ClassifiedsApp.Infrastructure.Services.Auth;
 using ClassifiedsApp.Infrastructure.Services.BackgroundJobs;
+using ClassifiedsApp.Infrastructure.Services.Cache;
 using ClassifiedsApp.Infrastructure.Services.Mail;
 using ClassifiedsApp.Infrastructure.Services.RateLimit;
 using ClassifiedsApp.Infrastructure.Services.Users;
@@ -32,6 +35,7 @@ using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using StackExchange.Redis;
 
 namespace ClassifiedsApp.Infrastructure;
 
@@ -61,9 +65,7 @@ public static class ServiceRegistration
 
 		services.Configure<RateLimitOptionsDto>(configuration.GetSection("RateLimit"));
 
-
 		// caching usage
-		/*
 
 		var cacheConfig = new CacheConfigDto();
 
@@ -85,13 +87,10 @@ public static class ServiceRegistration
 		else
 		{
 			// If Redis is disabled, use in-memory cache
-
 			services.AddDistributedMemoryCache();
 		}
 
 		services.AddScoped<ICacheService, RedisCacheService>();
-		
-		*/
 
 		services.AddScoped<IAdReadRepository, AdReadRepository>();
 		services.AddScoped<IAdWriteRepository, AdWriteRepository>();
@@ -152,6 +151,7 @@ public static class ServiceRegistration
 
 		services.AddScoped<TestJobService>(); // add test job service.
 		services.AddScoped<RateLimitResetJobService>(); // add rate limit job service.
+		services.AddScoped<FeaturedAdResetJobService>(); // add reset ad feature job service.
 
 
 	}

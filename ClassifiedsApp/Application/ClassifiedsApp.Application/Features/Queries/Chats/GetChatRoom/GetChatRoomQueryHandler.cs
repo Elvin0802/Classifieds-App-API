@@ -48,9 +48,6 @@ public class GetChatRoomQueryHandler : IRequestHandler<GetChatRoomQuery, Result<
 			var lastMessage = _сhatMessageReadRepository.GetWhere(m => m.AdId == chatRoom.AdId &&
 						(m.SenderId == chatRoom.BuyerId || m.SenderId == chatRoom.SellerId) &&
 						(m.ReceiverId == chatRoom.BuyerId || m.ReceiverId == chatRoom.SellerId))
-					//.Include(m => m.Ad)
-					//.Include(m => m.Sender)
-					//.Include(m => m.Receiver)
 					.ToList();
 
 			var lastMessageAt = lastMessage.Count != 0 ? lastMessage.Max(m => m.CreatedAt) : chatRoom.CreatedAt;

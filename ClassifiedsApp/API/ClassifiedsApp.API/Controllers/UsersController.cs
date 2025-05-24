@@ -1,7 +1,9 @@
 ﻿using ClassifiedsApp.Application.Common.Results;
 using ClassifiedsApp.Application.Features.Commands.Auth.Register;
 using ClassifiedsApp.Application.Features.Commands.Users.ChangePassword;
+using ClassifiedsApp.Application.Features.Commands.Users.ResendVerification;
 using ClassifiedsApp.Application.Features.Commands.Users.UpdatePassword;
+using ClassifiedsApp.Application.Features.Commands.Users.VerifyEmail;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -28,11 +30,19 @@ public class UsersController : ControllerBase
 		return Ok(await _mediator.Send(command));
 	}
 
-	//[HttpPost]
-	//public async Task<ActionResult<Result>> CheckEmail(RegisterCommand command)
-	//{
-	//	return Ok(await _mediator.Send(command));
-	//}
+	[HttpPost]
+	[DisableRateLimiting]
+	public async Task<ActionResult<Result>> VerifyEmail([FromBody] VerifyEmailCommand command)
+	{
+		return Ok(await _mediator.Send(command));
+	}
+
+	[HttpPost]
+	[DisableRateLimiting]
+	public async Task<ActionResult<Result>> ResendVerification([FromBody] ResendVerificationCommand command)
+	{
+		return Ok(await _mediator.Send(command));
+	}
 
 	[HttpPost]
 	[DisableRateLimiting]

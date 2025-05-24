@@ -59,4 +59,15 @@ public class MailService : IMailService
 
 		await SendMailAsync(to, "Reset Password Request", mail.ToString());
 	}
+
+	public async Task SendEmailConfirmMailAsync(string to, string code)
+	{
+		StringBuilder mail = new();
+
+		mail.AppendLine("Salam<br>Eger qeydiyyatdan kecmek isteyirsinizse, ashagidaki kodu daxil edin.<br><strong> ");
+		mail.AppendLine(code);
+		mail.AppendLine(" </strong><br><br><span style=\"font-size:16px;\">DIQQET : Eger her hansi qeydiyyatdan kecme isteyiniz olmayibsa, bu maili gormezden gelin..</span><br>Teshekkurler...<br><br><br>Classifieds App");
+
+		await SendMailAsync(to, "Reset Password Request", mail.ToString());
+	}
 }

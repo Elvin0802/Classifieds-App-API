@@ -34,10 +34,10 @@ public class GetAllAdsQueryHandler : IRequestHandler<GetAllAdsQuery, Result<GetA
 										.ThenInclude(su => su.AppUser)
 									.AsQueryable();
 
-			if (!(request.AdStatus.HasValue))
-				query = query.Where(ad => ad.Status == AdStatus.Active);
+			if (!(request.AdStatus.HasValue) || request.AdStatus == AdStatus.Active)
+				query = query.Where(ad => ad.Status == AdStatus.Active && ad.ExpiresAt > DateTimeOffset.UtcNow);
 			else
-				query = query.Where(ad => ad.Status == request.AdStatus.Value);
+				query = query.Where(ad => ad.Status == request.AdStatus!.Value);
 
 			if (request.SearchedAppUserId.HasValue)
 			{
@@ -49,14 +49,23 @@ public class GetAllAdsQueryHandler : IRequestHandler<GetAllAdsQuery, Result<GetA
 			if (!(request.SearchedAppUserId.HasValue))
 			{
 				// get vip ads.
-				if (request.IsFeatured)
+				if (request.IsFeatured.HasValue)
 				{
-					query = query.Where(ad => ad.IsFeatured && ad.FeatureEndDate > DateTimeOffset.UtcNow)
-								 .OrderByDescending(ad => ad.FeaturePriority)
-								 .ThenByDescending(ad => ad.FeatureStartDate);
+					if (request.IsFeatured!.Value)
+						query = query.Where(ad => ad.IsFeatured && ad.FeatureEndDate > DateTimeOffset.UtcNow)
+									 .OrderByDescending(ad => ad.FeaturePriority)
+									 .ThenByDescending(ad => ad.FeatureStartDate);
+					else if (request.IsFeatured!.Value == false)
+						query = query.Where(ad => ad.IsFeatured == false);
 				}
+			}
+
+			if (request.IsNew.HasValue)
+			{
+				if (request.IsNew.Value)
+					query = query.Where(ad => ad.IsNew == true);
 				else
-					query = query.Where(ad => ad.IsFeatured == false);
+					query = query.Where(ad => ad.IsNew == false);
 			}
 
 			// Apply search filter
@@ -117,7 +126,10 @@ public class GetAllAdsQueryHandler : IRequestHandler<GetAllAdsQuery, Result<GetA
 					IsFeatured = p.IsFeatured,
 					MainImageUrl = p.Images.FirstOrDefault(img => img.SortOrder == 0)!.Url,
 					IsSelected = request.CurrentAppUserId.HasValue && p.SelectorUsers.Any(su => su.AppUserId == request.CurrentAppUserId.Value),
+					CreatedAt = p.CreatedAt,
 					UpdatedAt = p.UpdatedAt,
+					Status = p.Status,
+					ExpiresAt = p.ExpiresAt
 				})
 				.ToListAsync(cancellationToken);
 

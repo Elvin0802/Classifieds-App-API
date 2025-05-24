@@ -1,12 +1,6 @@
-﻿using ClassifiedsApp.Application.Interfaces.Repositories.Ads;
-using ClassifiedsApp.Application.Interfaces.Services.BackgroundJobs;
+﻿using ClassifiedsApp.Application.Interfaces.Services.BackgroundJobs;
 using ClassifiedsApp.Application.Interfaces.Services.RateLimit;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ClassifiedsApp.Infrastructure.Services.BackgroundJobs;
 

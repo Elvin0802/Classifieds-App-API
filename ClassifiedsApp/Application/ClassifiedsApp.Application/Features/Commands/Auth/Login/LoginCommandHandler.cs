@@ -1,5 +1,4 @@
-﻿using Azure;
-using Azure.Identity;
+﻿using Azure.Identity;
 using ClassifiedsApp.Application.Common.Results;
 using ClassifiedsApp.Application.Dtos.Auth.Token;
 using ClassifiedsApp.Application.Interfaces.Services.Auth;

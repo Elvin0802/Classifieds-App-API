@@ -13,6 +13,10 @@ public class AppUser : IdentityUser<Guid>
 	public DateTimeOffset UpdatedAt { get; set; }
 	public DateTimeOffset ArchivedAt { get; set; }
 
+	public bool IsBlacklisted { get; set; } = false;
+	public DateTimeOffset? BlacklistedAt { get; set; }
+	public string? BlacklistReason { get; set; }
+
 	public IList<Ad> Ads { get; set; }
 	public IList<UserAdSelection> SelectedAds { get; set; }
 	public IList<FeaturedAdTransaction> FeatureTransactions { get; set; }

@@ -1,4 +1,5 @@
 ﻿using ClassifiedsApp.Application.Common.Results;
+using ClassifiedsApp.Application.Interfaces.Repositories.Ads;
 using ClassifiedsApp.Application.Interfaces.Repositories.Users;
 using ClassifiedsApp.Application.Interfaces.Services.Users;
 using ClassifiedsApp.Core.Entities;
@@ -10,12 +11,16 @@ namespace ClassifiedsApp.Application.Features.Commands.Users.SelectAdCommand;
 public class SelectAdCommandHandler : IRequestHandler<SelectAdCommand, Result>
 {
 	readonly IUserAdSelectionWriteRepository _writeRepository;
+	readonly IAdReadRepository _readRepository;
 	readonly ICurrentUserService _currentUserService;
 
-	public SelectAdCommandHandler(IUserAdSelectionWriteRepository writeRepository, ICurrentUserService currentUserService)
+	public SelectAdCommandHandler(IUserAdSelectionWriteRepository writeRepository,
+								  ICurrentUserService currentUserService,
+								  IAdReadRepository readRepository)
 	{
 		_writeRepository = writeRepository;
 		_currentUserService = currentUserService;
+		_readRepository = readRepository;
 	}
 
 	public async Task<Result> Handle(SelectAdCommand request, CancellationToken cancellationToken)
@@ -29,6 +34,12 @@ public class SelectAdCommandHandler : IRequestHandler<SelectAdCommand, Result>
 
 			if (item is not null)
 				throw new Exception("Ad selection found.");
+
+			var ad = await _readRepository.Table.Where(ad => ad.Id == request.SelectAdId).FirstOrDefaultAsync() ??
+					throw new Exception("Ad not found.");
+
+			if (ad.AppUserId == _currentUserService.UserId)
+				throw new NotSupportedException("Ad not selectable by creator user.");
 
 			await _writeRepository.AddAsync(new UserAdSelection()
 			{

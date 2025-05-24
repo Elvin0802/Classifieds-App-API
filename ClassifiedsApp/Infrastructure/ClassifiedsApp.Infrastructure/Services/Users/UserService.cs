@@ -67,8 +67,27 @@ public class UserService : IUserService
 	public async Task<bool> CreateAsync(CreateAppUserDto dto) // *
 	{
 		var existingUser = await _userManager.FindByEmailAsync(dto.Email);
+
 		if (existingUser is not null)
-			return false;
+		{
+			if (!existingUser.EmailConfirmed)
+			{
+				existingUser.Name = dto.Name;
+				existingUser.PhoneNumber = dto.PhoneNumber;
+				existingUser.UpdatedAt = DateTimeOffset.UtcNow;
+
+				await _userManager.UpdateAsync(existingUser);
+
+				await _userManager.RemovePasswordAsync(existingUser);
+				await _userManager.AddPasswordAsync(existingUser, dto.Password);
+
+				await ResendVerificationCodeAsync(dto.Email);
+
+				return true;
+			}
+			else
+				return false;
+		}
 
 		var user = new AppUser
 		{

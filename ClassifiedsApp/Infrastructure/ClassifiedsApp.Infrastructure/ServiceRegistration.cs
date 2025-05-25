@@ -11,6 +11,7 @@ using ClassifiedsApp.Application.Interfaces.Repositories.Reports;
 using ClassifiedsApp.Application.Interfaces.Repositories.Users;
 using ClassifiedsApp.Application.Interfaces.Services.Ads;
 using ClassifiedsApp.Application.Interfaces.Services.Auth;
+using ClassifiedsApp.Application.Interfaces.Services.BlackList;
 using ClassifiedsApp.Application.Interfaces.Services.Cache;
 using ClassifiedsApp.Application.Interfaces.Services.Common;
 using ClassifiedsApp.Application.Interfaces.Services.Mail;
@@ -28,13 +29,13 @@ using ClassifiedsApp.Infrastructure.Persistence.Repositories.Users;
 using ClassifiedsApp.Infrastructure.Services.Ads;
 using ClassifiedsApp.Infrastructure.Services.Auth;
 using ClassifiedsApp.Infrastructure.Services.BackgroundJobs;
+using ClassifiedsApp.Infrastructure.Services.BlackList;
 using ClassifiedsApp.Infrastructure.Services.Cache;
 using ClassifiedsApp.Infrastructure.Services.Encryption;
 using ClassifiedsApp.Infrastructure.Services.Mail;
 using ClassifiedsApp.Infrastructure.Services.RateLimit;
 using ClassifiedsApp.Infrastructure.Services.Users;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -94,6 +95,8 @@ public static class ServiceRegistration
 		}
 
 		services.AddScoped<ICacheService, RedisCacheService>();
+
+		services.AddScoped<IBlacklistService, BlacklistService>();
 
 		services.Configure<EncryptionSettingsDto>(configuration.GetSection("Encryption"));
 		services.AddScoped<IEncryptionService, EncryptionService>();

@@ -1,14 +1,8 @@
 ﻿using ClassifiedsApp.Application.Common.Results;
-using ClassifiedsApp.Application.Features.Commands.Users.ChangeName;
 using ClassifiedsApp.Application.Interfaces.Services.Users;
 using ClassifiedsApp.Core.Entities;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ClassifiedsApp.Application.Features.Commands.Users.ChangePhoneNumber;
 

@@ -1,10 +1,10 @@
 ﻿using ClassifiedsApp.Application.Common.Helpers;
 using ClassifiedsApp.Application.Dtos.Auth.Users;
+using ClassifiedsApp.Application.Interfaces.Services.BlackList;
 using ClassifiedsApp.Application.Interfaces.Services.Cache;
 using ClassifiedsApp.Application.Interfaces.Services.Mail;
 using ClassifiedsApp.Application.Interfaces.Services.Users;
 using ClassifiedsApp.Core.Entities;
-using ClassifiedsApp.Infrastructure.Services.Cache;
 using Microsoft.AspNetCore.Identity;
 using System.Text.Json;
 
@@ -15,12 +15,17 @@ public class UserService : IUserService
 	readonly UserManager<AppUser> _userManager;
 	readonly ICacheService _cacheService;
 	readonly IMailService _mailService;
+	readonly IBlacklistService _blacklistService;
 
-	public UserService(UserManager<AppUser> userManager, ICacheService cacheService, IMailService mailService)
+	public UserService(UserManager<AppUser> userManager,
+						ICacheService cacheService,
+						IMailService mailService,
+						IBlacklistService blacklistService)
 	{
 		_userManager = userManager;
 		_cacheService = cacheService;
 		_mailService = mailService;
+		_blacklistService = blacklistService;
 	}
 
 	public async Task<bool> ChangePasswordAsync(string userId, string oldPassword, string newPassword)
@@ -66,6 +71,12 @@ public class UserService : IUserService
 
 	public async Task<bool> CreateAsync(CreateAppUserDto dto) // *
 	{
+		if (await _blacklistService.IsUserBlacklistedAsync(dto.Email))
+		{
+			var blockedUser = await _userManager.FindByEmailAsync(dto.Email);
+			throw new NotSupportedException($"User with this email, blocked. Reason: {blockedUser?.BlacklistReason}");
+		}
+
 		var existingUser = await _userManager.FindByEmailAsync(dto.Email);
 
 		if (existingUser is not null)

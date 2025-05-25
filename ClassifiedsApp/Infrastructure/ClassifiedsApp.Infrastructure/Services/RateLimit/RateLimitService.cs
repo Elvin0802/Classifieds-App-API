@@ -1,13 +1,7 @@
 ﻿using ClassifiedsApp.Application.Dtos.RateLimit;
 using ClassifiedsApp.Application.Interfaces.Services.RateLimit;
-using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.Extensions.Options;
-using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ClassifiedsApp.Infrastructure.Services.RateLimit;
 

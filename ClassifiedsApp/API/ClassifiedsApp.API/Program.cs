@@ -7,8 +7,11 @@ using ClassifiedsApp.Core.Entities;
 using ClassifiedsApp.Infrastructure;
 using ClassifiedsApp.SignalR;
 using ClassifiedsApp.SignalR.Hubs;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Serilog;
+using System.Text.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,6 +32,10 @@ builder.Services.AddInfrastructureServices(builder.Configuration);
 builder.Services.AddSignalRServices();
 
 builder.Services.AddSwagger();
+
+builder.Services.AddHealthChecks()
+	.AddCheck("self", () => HealthCheckResult.Healthy()) // Liveness
+	.AddSqlServer(builder.Configuration["ConnectionStrings:Default"]!, name: "sql", failureStatus: HealthStatus.Unhealthy); // Readiness
 
 builder.Services.AddBackgroundJobs(builder.Configuration);
 
@@ -62,6 +69,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.UseMiddleware<RateLimitingMiddleware>();
+app.UseMiddleware<BlackListProtectionMiddleware>();
 
 app.MapControllers();
 
@@ -83,6 +91,37 @@ using (var scope = app.Services.CreateScope())
 									scope.ServiceProvider.GetRequiredService<ILocationReadRepository>(),
 									scope.ServiceProvider.GetRequiredService<ILocationWriteRepository>());
 }
+
+
+// LIVENESS
+app.MapHealthChecks("/health/live", new HealthCheckOptions
+{
+	Predicate = check => check.Name == "self"
+});
+
+app.MapHealthChecks("/health/ready", new HealthCheckOptions
+{
+	Predicate = _ => true,
+	ResponseWriter = async (context, report) =>
+	{
+		context.Response.ContentType = "application/json";
+
+		var result = JsonSerializer.Serialize(new
+		{
+			status = report.Status.ToString(),
+			checks = report.Entries.Select(entry => new
+			{
+				name = entry.Key,
+				status = entry.Value.Status.ToString(),
+				error = entry.Value.Exception?.Message
+			})
+		});
+
+		await context.Response.WriteAsync(result);
+	}
+});
+
+app.MapGet("/", () => "The API is working successfully.");
 
 app.Run();
 

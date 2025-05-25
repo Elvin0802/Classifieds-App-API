@@ -1,5 +1,4 @@
 ﻿using Azure;
-using ClassifiedsApp.Application.Common.Consts;
 using ClassifiedsApp.Application.Common.Results;
 using ClassifiedsApp.Application.Interfaces.Repositories.Ads;
 using ClassifiedsApp.Application.Interfaces.Services.Ads;

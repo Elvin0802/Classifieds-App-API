@@ -1,5 +1,4 @@
-﻿using ClassifiedsApp.Application.Features.Commands.Auth.Login;
-using FluentValidation;
+﻿using FluentValidation;
 
 namespace ClassifiedsApp.Application.Features.Commands.Auth.Register;
 

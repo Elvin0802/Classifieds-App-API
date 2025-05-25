@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ClassifiedsApp.Application.Dtos.RateLimit;
+﻿namespace ClassifiedsApp.Application.Dtos.RateLimit;
 
 public class RateLimitInfoDto
 {

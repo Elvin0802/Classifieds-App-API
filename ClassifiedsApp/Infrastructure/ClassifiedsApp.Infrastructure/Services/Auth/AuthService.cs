@@ -2,6 +2,7 @@
 using ClassifiedsApp.Application.Common.Helpers;
 using ClassifiedsApp.Application.Dtos.Auth.Token;
 using ClassifiedsApp.Application.Interfaces.Services.Auth;
+using ClassifiedsApp.Application.Interfaces.Services.BlackList;
 using ClassifiedsApp.Application.Interfaces.Services.Mail;
 using ClassifiedsApp.Application.Interfaces.Services.Users;
 using ClassifiedsApp.Core.Entities;
@@ -18,18 +19,21 @@ public class AuthService : IAuthService
 	readonly SignInManager<AppUser> _signInManager;
 	readonly ITokenService _tokenService;
 	readonly IUserService _userService;
+	readonly IBlacklistService _blacklistService;
 
 	public AuthService(UserManager<AppUser> userManager,
 						IMailService mailService,
 						SignInManager<AppUser> signInManager,
 						ITokenService tokenService,
-						IUserService userService)
+						IUserService userService,
+						IBlacklistService blacklistService)
 	{
 		_userManager = userManager;
 		_mailService = mailService;
 		_signInManager = signInManager;
 		_tokenService = tokenService;
 		_userService = userService;
+		_blacklistService = blacklistService;
 	}
 
 	public async Task<bool> ConfirmResetTokenAsync(string userId, string resetToken)
@@ -44,6 +48,12 @@ public class AuthService : IAuthService
 
 	public async Task<AuthTokenDto> LoginAsync(string email, string password)
 	{
+		if (await _blacklistService.IsUserBlacklistedAsync(email))
+		{
+			var blockedUser = await _userManager.FindByEmailAsync(email);
+			throw new NotSupportedException($"User with this email, blocked. Reason: {blockedUser?.BlacklistReason}");
+		}
+
 		AppUser? user = await _userManager.FindByEmailAsync(email) ??
 						throw new KeyNotFoundException($"User Not Found with this email: {email}.");
 

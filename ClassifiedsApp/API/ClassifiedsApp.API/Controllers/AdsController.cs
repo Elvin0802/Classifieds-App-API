@@ -49,7 +49,7 @@ public class AdsController : ControllerBase
 		return Ok(await _mediator.Send(query));
 	}
 
-	[HttpGet]
+	[HttpDelete]
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin,User")]
 	public async Task<ActionResult<Result>> Delete([FromQuery] DeleteAdCommand command)
 	{

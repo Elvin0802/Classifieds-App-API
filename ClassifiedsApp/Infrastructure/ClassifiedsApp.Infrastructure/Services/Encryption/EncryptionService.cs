@@ -1,12 +1,8 @@
 ﻿using ClassifiedsApp.Application.Dtos.Encryption;
 using ClassifiedsApp.Application.Interfaces.Services.Common;
 using Microsoft.Extensions.Options;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace ClassifiedsApp.Infrastructure.Services.Encryption;
 

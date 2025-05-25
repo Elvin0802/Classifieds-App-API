@@ -1,6 +1,8 @@
 ﻿using ClassifiedsApp.Application.Dtos.Auth.Users;
+using ClassifiedsApp.Application.Interfaces.Repositories.Ads;
 using ClassifiedsApp.Application.Interfaces.Services.BlackList;
 using ClassifiedsApp.Core.Entities;
+using ClassifiedsApp.Core.Enums;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 
@@ -8,12 +10,15 @@ namespace ClassifiedsApp.Infrastructure.Services.BlackList;
 
 public class BlacklistService : IBlacklistService
 {
-	private readonly UserManager<AppUser> _userManager;
-	private readonly ILogger<BlacklistService> _logger;
+	readonly UserManager<AppUser> _userManager;
+	readonly IAdWriteRepository _adWriteRepository;
+	readonly ILogger<BlacklistService> _logger;
 
-	public BlacklistService(UserManager<AppUser> userManager, ILogger<BlacklistService> logger)
+	public BlacklistService(UserManager<AppUser> userManager, ILogger<BlacklistService> logger,
+	IAdWriteRepository adWriteRepository)
 	{
 		_userManager = userManager;
+		_adWriteRepository = adWriteRepository;
 		_logger = logger;
 	}
 
@@ -40,8 +45,16 @@ public class BlacklistService : IBlacklistService
 		user.IsBlacklisted = true;
 		user.BlacklistReason = reason;
 		user.BlacklistedAt = DateTimeOffset.UtcNow;
-		user.RefreshToken = null; // Invalidate refresh token
+		user.RefreshToken = null;
 		user.RefreshTokenExpiresAt = null;
+
+		foreach (var ad in user.Ads)
+		{
+			ad.ArchivedAt = DateTimeOffset.UtcNow;
+			ad.Status = AdStatus.Archived;
+		}
+
+		await _adWriteRepository.SaveAsync();
 
 		var result = await _userManager.UpdateAsync(user);
 		if (!result.Succeeded)
@@ -62,6 +75,12 @@ public class BlacklistService : IBlacklistService
 		user.IsBlacklisted = false;
 		user.BlacklistReason = null;
 		user.BlacklistedAt = null;
+
+		foreach (var ad in user.Ads)
+		{
+			ad.ExpiresAt = DateTimeOffset.UtcNow.AddDays(-1);
+			ad.Status = AdStatus.Expired;
+		}
 
 		var result = await _userManager.UpdateAsync(user);
 		if (!result.Succeeded)

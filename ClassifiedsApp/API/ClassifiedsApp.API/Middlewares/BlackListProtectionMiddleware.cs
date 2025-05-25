@@ -6,21 +6,18 @@ public class BlackListProtectionMiddleware
 {
 	private readonly RequestDelegate _next;
 	private readonly IServiceScopeFactory _serviceScopeFactory;
+	readonly ILogger<BlackListProtectionMiddleware> _logger;
 
-	public BlackListProtectionMiddleware(RequestDelegate next, IServiceScopeFactory serviceScopeFactory)
+	public BlackListProtectionMiddleware(RequestDelegate next, IServiceScopeFactory serviceScopeFactory,
+											ILogger<BlackListProtectionMiddleware> logger)
 	{
 		_next = next;
 		_serviceScopeFactory = serviceScopeFactory;
+		_logger = logger;
 	}
 
 	public async Task InvokeAsync(HttpContext context)
 	{
-		if (context.Request.Path.StartsWithSegments("/api/auth") || !context.User.Identity.IsAuthenticated)
-		{
-			await _next(context);
-			return;
-		}
-
 		using var scope = _serviceScopeFactory.CreateScope();
 		var blacklistService = scope.ServiceProvider.GetRequiredService<IBlacklistService>();
 
@@ -31,6 +28,8 @@ public class BlackListProtectionMiddleware
 			{
 				context.Response.StatusCode = 403; // 403 Forbidden.
 				await context.Response.WriteAsync("User is blocked.");
+
+				_logger.LogError($"failed for : {userId}");
 				return;
 			}
 		}

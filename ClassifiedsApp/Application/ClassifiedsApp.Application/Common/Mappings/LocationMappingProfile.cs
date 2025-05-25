@@ -10,7 +10,6 @@ public class LocationMappingProfile : Profile
 	public LocationMappingProfile()
 	{
 		CreateMap<CreateLocationCommand, Location>();
-
 		CreateMap<Location, LocationDto>().ReverseMap();
 
 	}

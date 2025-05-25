@@ -9,19 +9,5 @@ public class AppUserMappingProfile : Profile
 	public AppUserMappingProfile()
 	{
 		CreateMap<AppUser, AppUserDto>().ReverseMap();
-
-		/*
-
-		// for crud
-		
-		CreateMap<AppUser, CreateAppUserDto>().ReverseMap();
-		CreateMap<AppUser, UpdateAppUserDto>().ReverseMap();
-
-		// if dont need , dont use ReverseMap !
-
-		CreateMap<AppUser, CreateAppUserDto>()
-		CreateMap<AppUser, UpdateAppUserDto>()
-		
-		*/
 	}
 }

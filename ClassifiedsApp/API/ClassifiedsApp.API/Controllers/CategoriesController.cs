@@ -2,6 +2,9 @@
 using ClassifiedsApp.Application.Features.Commands.Categories.CreateCategory;
 using ClassifiedsApp.Application.Features.Commands.Categories.CreateMainCategory;
 using ClassifiedsApp.Application.Features.Commands.Categories.CreateSubCategory;
+using ClassifiedsApp.Application.Features.Commands.Categories.DeleteCategory;
+using ClassifiedsApp.Application.Features.Commands.Categories.DeleteMainCategory;
+using ClassifiedsApp.Application.Features.Commands.Categories.DeleteSubCategory;
 using ClassifiedsApp.Application.Features.Queries.Categories.GetAllCategories;
 using ClassifiedsApp.Application.Features.Queries.Categories.GetAllMainCategories;
 using ClassifiedsApp.Application.Features.Queries.Categories.GetAllSubCategories;
@@ -50,6 +53,13 @@ public class CategoriesController : ControllerBase
 		return Ok(await _mediator.Send(query));
 	}
 
+	[HttpDelete("delete/category")]
+	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+	public async Task<ActionResult<Result>> Delete([FromQuery] DeleteCategoryCommand command)
+	{
+		return Ok(await _mediator.Send(command));
+	}
+
 	#endregion
 
 	#region Main Category Section
@@ -75,6 +85,13 @@ public class CategoriesController : ControllerBase
 		return Ok(await _mediator.Send(query));
 	}
 
+	[HttpDelete("delete/main-category")]
+	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+	public async Task<ActionResult<Result>> Delete([FromQuery] DeleteMainCategoryCommand command)
+	{
+		return Ok(await _mediator.Send(command));
+	}
+
 	#endregion
 
 	#region Sub Category Section
@@ -98,6 +115,13 @@ public class CategoriesController : ControllerBase
 	public async Task<ActionResult<Result<GetSubCategoryByIdQueryResponse>>> GetById([FromQuery] GetSubCategoryByIdQuery query)
 	{
 		return Ok(await _mediator.Send(query));
+	}
+
+	[HttpDelete("delete/sub-category")]
+	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+	public async Task<ActionResult<Result>> Delete([FromQuery] DeleteSubCategoryCommand command)
+	{
+		return Ok(await _mediator.Send(command));
 	}
 
 	#endregion

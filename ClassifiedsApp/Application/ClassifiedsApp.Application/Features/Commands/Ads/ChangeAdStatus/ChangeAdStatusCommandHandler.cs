@@ -29,7 +29,7 @@ public class ChangeAdStatusCommandHandler : IRequestHandler<ChangeAdStatusComman
 			ad.UpdatedAt = DateTimeOffset.UtcNow;
 
 			if (ad.Status == AdStatus.Active)
-				ad.ExpiresAt = ad.UpdatedAt.AddDays(7);
+				ad.ExpiresAt = ad.UpdatedAt.AddDays(30);
 
 			_adWriteRepository.Update(ad);
 			await _adWriteRepository.SaveAsync();

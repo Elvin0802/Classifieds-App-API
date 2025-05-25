@@ -81,15 +81,6 @@ using (var scope = app.Services.CreateScope())
 	await SeedData.AddSeedRolesAndUsersAsync(scope.ServiceProvider.GetRequiredService<RoleManager<AppRole>>(),
 											 scope.ServiceProvider.GetRequiredService<UserManager<AppUser>>(),
 											 builder.Configuration);
-
-	await SeedData.AddSeedDataAsync(scope.ServiceProvider.GetRequiredService<ICategoryReadRepository>(),
-									scope.ServiceProvider.GetRequiredService<ICategoryWriteRepository>(),
-									scope.ServiceProvider.GetRequiredService<IMainCategoryReadRepository>(),
-									scope.ServiceProvider.GetRequiredService<IMainCategoryWriteRepository>(),
-									scope.ServiceProvider.GetRequiredService<ISubCategoryReadRepository>(),
-									scope.ServiceProvider.GetRequiredService<ISubCategoryWriteRepository>(),
-									scope.ServiceProvider.GetRequiredService<ILocationReadRepository>(),
-									scope.ServiceProvider.GetRequiredService<ILocationWriteRepository>());
 }
 
 

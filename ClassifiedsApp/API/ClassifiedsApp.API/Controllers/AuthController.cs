@@ -27,7 +27,8 @@ public class AuthController : ControllerBase
 	[DisableRateLimiting]
 	public async Task<ActionResult<Result<string>>> Login(LoginCommand command)
 	{
-		AuthTokenDto authToken = (await _mediator.Send(command)).Data;
+		AuthTokenDto authToken = (await _mediator.Send(command)).Data ??
+								throw new ArgumentNullException("Login failed , mail or password is wrong.");
 
 		return Ok(Result.Success(authToken.AccessToken, "Login successfully completed."));
 	}

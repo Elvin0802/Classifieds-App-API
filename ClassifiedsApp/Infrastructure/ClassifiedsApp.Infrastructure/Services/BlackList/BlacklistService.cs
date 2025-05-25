@@ -48,10 +48,13 @@ public class BlacklistService : IBlacklistService
 		user.RefreshToken = null;
 		user.RefreshTokenExpiresAt = null;
 
-		foreach (var ad in user.Ads)
+		if (user.Ads is not null && user.Ads.Count > 0)
 		{
-			ad.ArchivedAt = DateTimeOffset.UtcNow;
-			ad.Status = AdStatus.Archived;
+			foreach (var ad in user.Ads)
+			{
+				ad.ArchivedAt = DateTimeOffset.UtcNow;
+				ad.Status = AdStatus.Archived;
+			}
 		}
 
 		await _adWriteRepository.SaveAsync();
@@ -76,10 +79,13 @@ public class BlacklistService : IBlacklistService
 		user.BlacklistReason = null;
 		user.BlacklistedAt = null;
 
-		foreach (var ad in user.Ads)
+		if (user.Ads is not null && user.Ads.Count > 0)
 		{
-			ad.ExpiresAt = DateTimeOffset.UtcNow.AddDays(-1);
-			ad.Status = AdStatus.Expired;
+			foreach (var ad in user.Ads)
+			{
+				ad.ExpiresAt = DateTimeOffset.UtcNow.AddDays(-1);
+				ad.Status = AdStatus.Expired;
+			}
 		}
 
 		var result = await _userManager.UpdateAsync(user);

@@ -58,7 +58,7 @@ public class AuthService : IAuthService
 
 			token.AccessToken = _tokenService.GenerateAccessToken(user.Id, email, roles, userClaims);
 			token.RefreshToken = _tokenService.GenerateRefreshToken();
-			token.RefreshTokenExpiresAt = DateTimeOffset.UtcNow.AddMinutes(30);
+			token.RefreshTokenExpiresAt = DateTimeOffset.UtcNow.AddMinutes(300);
 
 			await _userService.UpdateRefreshTokenAsync(user, token.RefreshToken, token.RefreshTokenExpiresAt.Value);
 
@@ -94,7 +94,7 @@ public class AuthService : IAuthService
 
 			token.AccessToken = _tokenService.GenerateAccessToken(user.Id, user.Email!, roles, userClaims);
 			token.RefreshToken = _tokenService.GenerateRefreshToken();
-			token.RefreshTokenExpiresAt = DateTimeOffset.UtcNow.AddMinutes(30);
+			token.RefreshTokenExpiresAt = DateTimeOffset.UtcNow.AddMinutes(300);
 
 			await _userService.UpdateRefreshTokenAsync(user, token.RefreshToken, token.RefreshTokenExpiresAt.Value);
 

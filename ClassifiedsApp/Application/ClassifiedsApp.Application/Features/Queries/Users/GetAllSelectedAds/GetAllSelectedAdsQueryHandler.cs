@@ -44,6 +44,11 @@ public class GetAllSelectedAdsQueryHandler : IRequestHandler<GetAllSelectedAdsQu
 					MainImageUrl = uas.Ad.Images.FirstOrDefault(img => img.SortOrder == 0)!.Url,
 					IsSelected = true,
 					UpdatedAt = uas.Ad.UpdatedAt,
+					Status = uas.Ad.Status,
+					ExpiresAt = uas.Ad.ExpiresAt,
+					IsFeatured = uas.Ad.IsFeatured,
+					IsNew = uas.Ad.IsNew,
+					CreatedAt = uas.Ad.CreatedAt,
 				})
 				.ToListAsync(cancellationToken);
 

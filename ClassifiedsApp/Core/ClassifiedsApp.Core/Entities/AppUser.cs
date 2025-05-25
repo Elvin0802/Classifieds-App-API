@@ -19,6 +19,7 @@ public class AppUser : IdentityUser<Guid>
 
 	public AppUser()
 	{
+		EmailConfirmed = false;
 		RefreshTokenExpiresAt = DateTimeOffset.MinValue;
 		ArchivedAt = DateTimeOffset.MinValue;
 		CreatedAt = DateTimeOffset.UtcNow;

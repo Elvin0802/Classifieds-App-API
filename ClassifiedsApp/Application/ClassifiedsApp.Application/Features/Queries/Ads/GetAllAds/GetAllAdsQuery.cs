@@ -19,8 +19,8 @@ public class GetAllAdsQuery : IRequest<GetAllAdsQueryResponse>
 public class GetAllAdsQuery : GetAllDataQuery<GetAllAdsQueryResponse>
 {
 	public string? SearchTitle { get; set; }
-	public bool IsFeatured { get; set; }
-
+	public bool? IsFeatured { get; set; }
+	public bool? IsNew { get; set; }
 	public decimal? MinPrice { get; set; }
 	public decimal? MaxPrice { get; set; }
 	public Guid? CategoryId { get; set; }

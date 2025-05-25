@@ -1,6 +1,7 @@
 ﻿using ClassifiedsApp.Application.Common.Results;
 using ClassifiedsApp.Application.Dtos.Chats;
 using ClassifiedsApp.Application.Interfaces.Repositories.Chats;
+using ClassifiedsApp.Application.Interfaces.Services.Common;
 using ClassifiedsApp.Application.Interfaces.Services.Users;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -12,15 +13,17 @@ public class GetChatMessagesByChatRoomQueryHandler : IRequestHandler<GetChatMess
 	readonly IChatRoomReadRepository _chatRoomReadRepository;
 	readonly IChatMessageReadRepository _chatMessageReadRepository;
 	readonly ICurrentUserService _currentUserService;
-
+	readonly IEncryptionService _encryptionService;
 
 	public GetChatMessagesByChatRoomQueryHandler(IChatRoomReadRepository chatRoomReadRepository,
 												 IChatMessageReadRepository chatMessageReadRepository,
-												 ICurrentUserService currentUserService)
+												 ICurrentUserService currentUserService,
+												 IEncryptionService encryptionService)
 	{
 		_chatRoomReadRepository = chatRoomReadRepository;
 		_chatMessageReadRepository = chatMessageReadRepository;
 		_currentUserService = currentUserService;
+		_encryptionService = encryptionService;
 	}
 
 	public async Task<Result<GetChatMessagesByChatRoomQueryResponse>> Handle(GetChatMessagesByChatRoomQuery request, CancellationToken cancellationToken)
@@ -41,7 +44,6 @@ public class GetChatMessagesByChatRoomQueryHandler : IRequestHandler<GetChatMess
 							.Include(m => m.Receiver)
 							.ToList();
 
-			// Sort by creation time
 			messages = messages.OrderBy(m => m.CreatedAt).ToList();
 
 			var messageDtos = new List<ChatMessageDto>();
@@ -51,7 +53,7 @@ public class GetChatMessagesByChatRoomQueryHandler : IRequestHandler<GetChatMess
 				messageDtos.Add(new ChatMessageDto
 				{
 					Id = message.Id,
-					Content = message.Content,
+					Content = _encryptionService.Decrypt(message.Content),
 					SenderId = message.SenderId,
 					ReceiverId = message.ReceiverId,
 					ChatRoomId = chatRoom.Id,

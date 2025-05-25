@@ -93,30 +93,6 @@ public static class DIConfig
 				RoleClaimType = ClaimTypes.Role
 			};
 
-			//options.Events = new JwtBearerEvents
-			//{
-			//	OnMessageReceived = context =>
-			//	{
-			//		if (context.Request.Headers.ContainsKey("Authorization"))
-			//		{
-			//			var header = context.Request.Headers["Authorization"].ToString();
-			//			if (header.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
-			//			{
-			//				context.Token = header.Substring("Bearer ".Length).Trim();
-			//			}
-			//		}
-			//		return Task.CompletedTask;
-			//	},
-			//	OnAuthenticationFailed = context =>
-			//	{
-			//		if (context.Exception.GetType() == typeof(SecurityTokenExpiredException))
-			//		{
-			//			context.Response.Headers.Append("Token-Expired", "true");
-			//		}
-			//		return Task.CompletedTask;
-			//	}
-			//};
-
 			options.Events = new JwtBearerEvents
 			{
 				OnMessageReceived = context =>
@@ -196,6 +172,21 @@ public static class DIConfig
 				.WithIdentity("RateLimitResetJob-trigger")
 				.WithSimpleSchedule(x => x
 					.WithIntervalInSeconds(windowSeconds)
+					.RepeatForever()));
+
+			#endregion
+
+			#region Ad Feature Reset Job
+
+			var adFeatureResetJobKey = new JobKey("AdFeatureResetJob");
+
+			q.AddJob<FeaturedAdResetJob>(opts => opts.WithIdentity(adFeatureResetJobKey));
+
+			q.AddTrigger(opts => opts
+				.ForJob(adFeatureResetJobKey)
+				.WithIdentity("AdFeatureResetJob-trigger")
+				.WithSimpleSchedule(schedule => schedule
+					.WithIntervalInHours(24)
 					.RepeatForever()));
 
 			#endregion

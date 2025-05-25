@@ -2,6 +2,7 @@
 using ClassifiedsApp.Application.Common.Results;
 using ClassifiedsApp.Application.Dtos.Chats;
 using ClassifiedsApp.Application.Interfaces.Repositories.Chats;
+using ClassifiedsApp.Application.Interfaces.Services.Common;
 using ClassifiedsApp.Application.Interfaces.Services.SignalR;
 using ClassifiedsApp.Application.Interfaces.Services.Users;
 using ClassifiedsApp.Core.Entities;
@@ -17,18 +18,21 @@ public class SendMessageCommandHandler : IRequestHandler<SendMessageCommand, Res
 	readonly UserManager<AppUser> _userManager;
 	readonly IChatHub _chatHub;
 	readonly ICurrentUserService _currentUserService;
+	readonly IEncryptionService _encryptionService;
 
 	public SendMessageCommandHandler(IChatRoomReadRepository chatRoomReadRepository,
 									 IChatMessageWriteRepository chatMessageWriteRepository,
 									 UserManager<AppUser> userManager,
 									 IChatHub chatHub,
-									 ICurrentUserService currentUserService)
+									 ICurrentUserService currentUserService,
+									 IEncryptionService encryptionService)
 	{
 		_chatRoomReadRepository = chatRoomReadRepository;
 		_chatMessageWriteRepository = chatMessageWriteRepository;
 		_userManager = userManager;
 		_chatHub = chatHub;
 		_currentUserService = currentUserService;
+		_encryptionService = encryptionService;
 	}
 
 	public async Task<Result<ChatMessageDto>> Handle(SendMessageCommand request, CancellationToken cancellationToken)
@@ -45,7 +49,7 @@ public class SendMessageCommandHandler : IRequestHandler<SendMessageCommand, Res
 
 			var message = new ChatMessage()
 			{
-				Content = request.Content,
+				Content = _encryptionService.Encrypt(request.Content), // Encrypt content for security.
 				SenderId = _currentUserService.UserId!.Value,
 				ReceiverId = receiverId,
 				AdId = chatRoom.AdId,
@@ -61,7 +65,7 @@ public class SendMessageCommandHandler : IRequestHandler<SendMessageCommand, Res
 			var messageDto = new ChatMessageDto
 			{
 				Id = message.Id,
-				Content = message.Content,
+				Content = _encryptionService.Decrypt(message.Content), // Decrypt content.
 				SenderId = message.SenderId,
 				SenderName = sender.Name,
 				CreatedAt = message.CreatedAt,

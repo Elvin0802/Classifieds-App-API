@@ -3,6 +3,7 @@ using ClassifiedsApp.Application.Dtos.Auth.Users;
 using ClassifiedsApp.Application.Dtos.Categories;
 using ClassifiedsApp.Application.Dtos.Common;
 using ClassifiedsApp.Application.Dtos.Locations;
+using ClassifiedsApp.Core.Enums;
 
 namespace ClassifiedsApp.Application.Dtos.Ads;
 
@@ -13,6 +14,8 @@ public class AdDto : BaseEntityDto
 	public decimal Price { get; set; }
 	public bool IsNew { get; set; }
 	public bool IsSelected { get; set; }
+
+	public AdStatus Status { get; set; }
 	public bool IsFeatured { get; set; } = false;
 	public bool IsOwner { get; set; } = false;
 	public DateTimeOffset ExpiresAt { get; set; }

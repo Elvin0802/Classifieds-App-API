@@ -56,6 +56,8 @@ public class GetAdByIdQueryHandler : IRequestHandler<GetAdByIdQuery, Result<GetA
 					Location = _mapper.Map<LocationDto>(item.Location),
 					AppUser = _mapper.Map<AppUserDto>(item.AppUser),
 
+					Status = item.Status,
+
 					IsOwner = item.AppUserId == request.CurrentAppUserId,
 					IsNew = item.IsNew,
 					IsFeatured = item.IsFeatured,

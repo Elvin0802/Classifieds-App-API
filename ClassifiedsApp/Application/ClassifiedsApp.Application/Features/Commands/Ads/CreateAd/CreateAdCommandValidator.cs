@@ -13,8 +13,5 @@ public class CreateAdCommandValidator : AbstractValidator<CreateAdCommand>
 		RuleFor(x => x.Description)
 		.NotEmpty().WithMessage("Description is required")
 		.MinimumLength(4).WithMessage("A valid Description is required");
-
-		RuleFor(x => x.Price).GreaterThan(0);
-
 	}
 }

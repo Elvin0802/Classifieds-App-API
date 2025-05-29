@@ -1,10 +1,4 @@
-﻿using ClassifiedsApp.Application.Features.Commands.Auth.Register;
-using FluentValidation;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using FluentValidation;
 
 namespace ClassifiedsApp.Application.Features.Commands.Users.VerifyEmail;
 

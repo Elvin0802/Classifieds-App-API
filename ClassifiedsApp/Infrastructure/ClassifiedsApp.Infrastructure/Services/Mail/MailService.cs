@@ -68,6 +68,6 @@ public class MailService : IMailService
 		mail.AppendLine(code);
 		mail.AppendLine(" </strong><br><br><span style=\"font-size:16px;\">DIQQET : Eger her hansi qeydiyyatdan kecme isteyiniz olmayibsa, bu maili gormezden gelin..</span><br>Teshekkurler...<br><br><br>Classifieds App");
 
-		await SendMailAsync(to, "Reset Password Request", mail.ToString());
+		await SendMailAsync(to, "Confirm Email Request", mail.ToString());
 	}
 }

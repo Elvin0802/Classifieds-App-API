@@ -1,8 +1,6 @@
 ﻿using ClassifiedsApp.API.Config;
 using ClassifiedsApp.API.Middlewares;
 using ClassifiedsApp.Application;
-using ClassifiedsApp.Application.Interfaces.Repositories.Categories;
-using ClassifiedsApp.Application.Interfaces.Repositories.Locations;
 using ClassifiedsApp.Core.Entities;
 using ClassifiedsApp.Infrastructure;
 using ClassifiedsApp.SignalR;
